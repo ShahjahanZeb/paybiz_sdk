@@ -44,28 +44,4 @@ public class AESEncryption {
         return key;
     }
 
-    // performs encryption & decryption
-    public static void main(String[] args) throws Exception
-    {
-        FileReader file = new FileReader("C://myprograms//plaintext.txt");
-        BufferedReader reader = new BufferedReader(file);
-        String text = "";
-        String line = reader.readLine();
-        while(line!= null)
-        {
-            text += line;
-            line = reader.readLine();
-        }
-        reader.close();
-        System.out.println(text);
-
-        String plainText = text;
-        String encryptedText = AESEncryption.encrypt(plainText);
-        String decryptedText = AESEncryption.decrypt(encryptedText);
-
-        System.out.println("Plain Text : " + plainText);
-        System.out.println("Encrypted Text : " + encryptedText);
-        System.out.println("Decrypted Text : " + decryptedText);
-    }
-
 }

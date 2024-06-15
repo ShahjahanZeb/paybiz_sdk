@@ -14,6 +14,7 @@ import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 
+import com.example.paybizsdk.Logger.FileLogger;
 import com.example.paybizsdk.constants.SDKConstants;
 import com.example.paybizsdk.constants.UICustomizationType;
 import com.example.paybizsdk.constants.WarningEnum;
@@ -60,9 +61,12 @@ public class ThreeDSService implements ThreeDS2Service {
 
     public static JSONObject deviceInformation;
 
+    private static final String TAG = "ThreeDSService";
+
     @Override
     public void initialize(Context applicationContext, ConfigParameters configParameters, String locale, Map<UICustomizationType, UiCustomization> uiCustomizationMap) throws InvalidInputException,
             SDKAlreadyInitializedException, SDKRuntimeException {
+        FileLogger.log("INFO", TAG, "--- Getting Device Info ---");
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setC001("Android");
         deviceInfo.setC002(Build.MANUFACTURER + "||" + Build.MODEL);
@@ -85,6 +89,7 @@ public class ThreeDSService implements ThreeDS2Service {
         deviceInfo.setC017(Utils.getUTCDateTime());
         deviceInfo.setC018(SDKConstants.SDK_TRANS_ID);
 
+        FileLogger.log("INFO", TAG, "--- Performing Security Checks ---");
         String isRoot = AndroidSecurityService.isRooted();
         if (isRoot != null || isRoot != "") {
             warnings.add(new Warning(WarningEnum.SW01, isRoot, WarningSeverity.HIGH));
@@ -122,25 +127,25 @@ public class ThreeDSService implements ThreeDS2Service {
             System.out.println("Location: " + location);
             if (location != null) {
                 return location;
-            } else {
-                System.out.println("Error in Location");
             }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            FileLogger.log("ERROR", TAG, e.getMessage());
         }
         return null;
     }
 
 
     private String getBluetoothDeviceName(Context context) {
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter != null) {
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this.activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+        try {
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (bluetoothAdapter != null) {
+                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this.activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                }
+                return bluetoothAdapter.getName();
             }
-            return bluetoothAdapter.getName();
-        } else {
-            System.out.println("Bluetooth not supported");
+        } catch (Exception e) {
+            FileLogger.log("ERROR", TAG, e.getMessage());
         }
         return null;
     }
@@ -154,8 +159,8 @@ public class ThreeDSService implements ThreeDS2Service {
             System.out.println(Utils.getSDKAppID());
             transactionService = new TransactionService(this.activity, this.context, Utils.getSDKAppID(), AESEncryption.encrypt(SDKConstants.SECRET_KEY), messageVersion);
             return transactionService;
-        } catch (Exception e){
-            Log.e("ENCRYPTION", e.getMessage());
+        } catch (Exception e) {
+            FileLogger.log("ERROR", TAG, e.getMessage());
         }
         return null;
     }

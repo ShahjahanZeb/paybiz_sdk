@@ -3,6 +3,7 @@ package com.example.paybizsdk.service;
 import android.app.Activity;
 import android.content.Context;
 
+import com.example.paybizsdk.Logger.FileLogger;
 import com.example.paybizsdk.constants.SDKConstants;
 import com.example.paybizsdk.entity.AuthenticationRequestParameters;
 import com.example.paybizsdk.entity.ChallengeParameters;
@@ -23,6 +24,8 @@ public class TransactionService implements Transaction {
 
     private String messageVersion;
 
+    private static final String TAG = "TransactionService";
+
     public TransactionService(Activity activity, Context context, String SDKAppID, String SDKEmpheralPublicKey, String messageVersion) {
         this.threeDS2Service = new ThreeDSService();
         this.activity = activity;
@@ -34,6 +37,7 @@ public class TransactionService implements Transaction {
 
     @Override
     public AuthenticationRequestParameters getAuthenticationRequestParameters() {
+        FileLogger.log("INFO", TAG, "--- In Get Authentication Request Parameters ---");
         return new AuthenticationRequestParameters(String.valueOf(ThreeDSService.deviceInformation), SDKConstants.SDK_TRANS_ID, this.SDKAppID,  SDKConstants.SDK_REF_NUM, null, null);
     }
 
@@ -44,6 +48,7 @@ public class TransactionService implements Transaction {
 
     @Override
     public ProgressDialog getProgressView(Activity currentActivity) {
+        FileLogger.log("INFO", TAG, "--- In Get Progress View ---");
         return new ProgressDialog(currentActivity);
     }
 
