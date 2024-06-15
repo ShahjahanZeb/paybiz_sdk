@@ -10,8 +10,6 @@ import java.util.Map;
 
 public interface ThreeDS2Service {
 
-
-
     public void initialize(android.content.Context applicationContext, ConfigParameters configParameters,
                           String locale, Map<UICustomizationType, UiCustomization> uiCustomizationMap);
 
