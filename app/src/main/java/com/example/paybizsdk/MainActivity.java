@@ -40,9 +40,7 @@ public class MainActivity extends AppCompatActivity {
         FileLogger.initialize(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        System.out.println("TOday Testing");
         paybizController.initialize();
-        System.out.println("i am back");
         ProgressDialog progressDialog = paybizController.createTransaction("abc","1.2.2").getProgressView(this);
         progressDialog.show();
         final Handler handler = new Handler();
@@ -53,8 +51,5 @@ public class MainActivity extends AppCompatActivity {
                 progressDialog.hide();
             }
         }, 6000);
-        System.out.println(paybizController.getSDKVersion());
-        System.out.println(paybizController.getWarnings());
-        System.out.println(paybizController.createTransaction("abc","1.2.2").getAuthenticationRequestParameters());
     }
 }

@@ -43,8 +43,7 @@ public class PaybizController implements Controller {
         this.activity = activity;
         this.context = context;
         threeDSService = new ThreeDSService(this.activity, this.context);
-//        FileLogger.initialize(context);
-
+        FileLogger.initialize(context);
     }
 
     @Override

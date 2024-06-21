@@ -35,6 +35,7 @@ import com.example.paybizsdk.utility.Utils;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -108,7 +109,7 @@ public class ThreeDSService implements ThreeDS2Service {
             warnings.add(new Warning(WarningEnum.SW05, "The OS or the OS version is not supported.", WarningSeverity.HIGH));
         }
         this.deviceInformation = AndroidSecurityService.setDeviceInformationData(deviceInfo, this.warnings);
-        System.out.println(this.deviceInformation);
+        FileLogger.log("INFO", TAG, String.valueOf(this.deviceInformation));
     }
 
     private Location getLocation(Context context) {
@@ -124,7 +125,6 @@ public class ThreeDSService implements ThreeDS2Service {
                 ActivityCompat.requestPermissions(this.activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 3);
             }
             Location location = locationManager.getLastKnownLocation(bestProvider);
-            System.out.println("Location: " + location);
             if (location != null) {
                 return location;
             }
@@ -156,7 +156,6 @@ public class ThreeDSService implements ThreeDS2Service {
             SDKRuntimeException {
         TransactionService transactionService = null;
         try {
-            System.out.println(Utils.getSDKAppID());
             transactionService = new TransactionService(this.activity, this.context, Utils.getSDKAppID(), AESEncryption.encrypt(SDKConstants.SECRET_KEY), messageVersion);
             return transactionService;
         } catch (Exception e) {
