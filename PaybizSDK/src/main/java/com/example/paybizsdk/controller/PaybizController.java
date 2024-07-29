@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.nfc.Tag;
 import android.os.Handler;
 
 import androidx.core.app.ActivityCompat;
@@ -13,7 +12,9 @@ import androidx.core.content.ContextCompat;
 import com.example.paybizsdk.Logger.FileLogger;
 import com.example.paybizsdk.constants.ButtonType;
 import com.example.paybizsdk.constants.UICustomizationType;
+import com.example.paybizsdk.entity.AuthenticationRequestParameters;
 import com.example.paybizsdk.entity.ButtonCustomization;
+import com.example.paybizsdk.entity.ChallengeParameters;
 import com.example.paybizsdk.entity.LabelCustomization;
 import com.example.paybizsdk.entity.TextBoxCustomization;
 import com.example.paybizsdk.entity.ToolbarCustomization;
@@ -24,6 +25,10 @@ import com.example.paybizsdk.service.ConfigParameters;
 import com.example.paybizsdk.service.ThreeDSService;
 import com.example.paybizsdk.service.UiCustomization;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -168,4 +173,11 @@ public class PaybizController implements Controller {
         return threeDSService.getWarnings();
     }
 
+    public void doChallenge(Activity activity, ChallengeParameters challengeParameters, JSONObject json) throws JSONException {
+        threeDSService.doChallenge(activity, challengeParameters, json);
+    }
+
+    public AuthenticationRequestParameters getAuthParams(){
+        return threeDSService.getParams();
+    }
 }
