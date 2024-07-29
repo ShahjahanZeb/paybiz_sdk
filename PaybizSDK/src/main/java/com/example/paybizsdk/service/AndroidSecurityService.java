@@ -75,7 +75,7 @@ public class AndroidSecurityService {
     public static JSONObject setDeviceInformationData(DeviceInfo deviceInfo, List<Warning> warnings) {
         deviceInformation = new JSONObject();
         try {
-            deviceInformation.put("DV", "1.6");
+            deviceInformation.put("DV", "02");
             JSONObject ddObject = new JSONObject();
             JSONObject dpnaObject = new JSONObject();
             if (!TextUtils.isEmpty(deviceInfo.getC001())) {

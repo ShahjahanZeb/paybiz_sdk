@@ -33,6 +33,7 @@ import com.example.paybizsdk.exceptions.SDKRuntimeException;
 import com.example.paybizsdk.interfaces.*;
 import com.example.paybizsdk.utility.Utils;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -63,6 +64,8 @@ public class ThreeDSService implements ThreeDS2Service {
     public static JSONObject deviceInformation;
 
     private static final String TAG = "ThreeDSService";
+
+    private TransactionService transactionService;
 
     @Override
     public void initialize(Context applicationContext, ConfigParameters configParameters, String locale, Map<UICustomizationType, UiCustomization> uiCustomizationMap) throws InvalidInputException,
@@ -154,7 +157,6 @@ public class ThreeDSService implements ThreeDS2Service {
     public Transaction createTransaction(String directoryServerID, String messageVersion) throws
             InvalidInputException, SDKNotInitializedException,
             SDKRuntimeException {
-        TransactionService transactionService = null;
         try {
             transactionService = new TransactionService(this.activity, this.context, Utils.getSDKAppID(), AESEncryption.encrypt(SDKConstants.SECRET_KEY), messageVersion);
             return transactionService;
@@ -178,6 +180,16 @@ public class ThreeDSService implements ThreeDS2Service {
     @Override
     public List<Warning> getWarnings() {
         return this.warnings;
+    }
+
+
+    public void doChallenge(Activity activity, ChallengeParameters challengeParameters, JSONObject json) throws JSONException {
+        transactionService.setAresJson(json);
+        transactionService.doChallenge(activity, challengeParameters, null, 5000);
+    }
+
+    public AuthenticationRequestParameters getParams(){
+       return transactionService.getAuthenticationRequestParameters();
     }
 
 }
