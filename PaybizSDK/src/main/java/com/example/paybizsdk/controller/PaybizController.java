@@ -56,28 +56,6 @@ public class PaybizController implements Controller {
         requestBluetoothConnectPermission();
     }
 
-    public void init() {
-        FileLogger.log("INFO", TAG, "--- In Initialize Method ---");
-        UiCustomization uiCustomization = new UiCustomization();
-        ButtonCustomization btnCustomization = new ButtonCustomization();
-        btnCustomization.setTextColor("#FF00FF");
-        ToolbarCustomization toolbarCustomization = new ToolbarCustomization();
-        toolbarCustomization.setBackgroundColor("#FF00FF");
-        LabelCustomization lblCustomization = new LabelCustomization();
-        lblCustomization.setTextColor("#FF00FF");
-        TextBoxCustomization txtboxCustomization = new TextBoxCustomization();
-        txtboxCustomization.setTextColor("#FF00FF");
-        uiCustomization.setButtonCustomization(btnCustomization, ButtonType.NEXT);
-        uiCustomization.setToolBarCustomization(toolbarCustomization);
-        uiCustomization.setLabelCustomization(lblCustomization);
-        uiCustomization.setTextBoxCustomization(txtboxCustomization);
-        Map<UICustomizationType, UiCustomization> uiCustomizationMap = new HashMap<>();
-        uiCustomizationMap.put(UICustomizationType.DEFAULT, uiCustomization);
-        String locale = Locale.getDefault().toString();
-        ConfigParameters configParameters = new ConfigParameters();
-        threeDSService.initialize(this.context, configParameters, locale, uiCustomizationMap);
-    }
-
     private void requestBluetoothConnectPermission() {
         FileLogger.log("INFO", TAG, "--- Request Bluetooth Connect Permission ---");
         Context context1 = this.context;
@@ -149,6 +127,28 @@ public class PaybizController implements Controller {
         }
     }
 
+    public void init() {
+        FileLogger.log("INFO", TAG, "--- In Initialize Method ---");
+        UiCustomization uiCustomization = new UiCustomization();
+        ButtonCustomization btnCustomization = new ButtonCustomization();
+        btnCustomization.setTextColor("#FF00FF");
+        ToolbarCustomization toolbarCustomization = new ToolbarCustomization();
+        toolbarCustomization.setBackgroundColor("#FF00FF");
+        LabelCustomization lblCustomization = new LabelCustomization();
+        lblCustomization.setTextColor("#FF00FF");
+        TextBoxCustomization txtboxCustomization = new TextBoxCustomization();
+        txtboxCustomization.setTextColor("#FF00FF");
+        uiCustomization.setButtonCustomization(btnCustomization, ButtonType.NEXT);
+        uiCustomization.setToolBarCustomization(toolbarCustomization);
+        uiCustomization.setLabelCustomization(lblCustomization);
+        uiCustomization.setTextBoxCustomization(txtboxCustomization);
+        Map<UICustomizationType, UiCustomization> uiCustomizationMap = new HashMap<>();
+        uiCustomizationMap.put(UICustomizationType.DEFAULT, uiCustomization);
+        String locale = Locale.getDefault().toString();
+        ConfigParameters configParameters = new ConfigParameters();
+        threeDSService.initialize(this.context, configParameters, locale, uiCustomizationMap);
+    }
+
     @Override
     public Transaction createTransaction(String directoryServerID, String messageVersion) {
         FileLogger.log("INFO", TAG, "--- In Create Transaction ---");
@@ -173,11 +173,18 @@ public class PaybizController implements Controller {
         return threeDSService.getWarnings();
     }
 
-    public void doChallenge(Activity activity, ChallengeParameters challengeParameters, JSONObject json) throws JSONException {
-        threeDSService.doChallenge(activity, challengeParameters, json);
+    @Override
+    public void doChallenge(Activity activity, JSONObject json) {
+        FileLogger.log("INFO", TAG, "--- In Do Challenge ---");
+        try {
+            threeDSService.doChallenge(activity, json);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public AuthenticationRequestParameters getAuthParams(){
+        FileLogger.log("INFO", TAG, "--- In Authentication Params ---");
         return threeDSService.getParams();
     }
 }

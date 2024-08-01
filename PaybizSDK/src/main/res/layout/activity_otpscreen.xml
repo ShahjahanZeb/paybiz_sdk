@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".OTPScreen"
+    android:background="@color/cardview_light_background"
+
+    >
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="200dp"
+        android:minHeight="100dp"
+        android:src="@drawable/ic_logibiz_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.076" />
+
+
+    <TextView
+        android:id="@+id/challengeInfoHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Challenge info Header"
+        android:textSize="20dp"
+        android:textFontWeight="1000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintVertical_bias="0.03" />
+
+    <TextView
+        android:id="@+id/challengeInfoLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Challenge Info Label"
+        android:textSize="17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/challengeInfoHeader"
+        app:layout_constraintVertical_bias="0.036" />
+
+    <TextView
+        android:id="@+id/challengeInfoText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Challenge Info Text"
+        android:textSize="17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.515"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/challengeInfoLabel"
+        app:layout_constraintVertical_bias="0.063" />
+
+    <EditText
+        android:id="@+id/otpInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Enter OTP"
+        android:minWidth="200dp"
+        android:minHeight="30dp"
+        app:hintTextColor="@color/cardview_dark_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/challengeInfoText"
+        app:layout_constraintVertical_bias="0.13"
+        android:inputType="textPassword"/>
+
+    <Button
+        android:id="@+id/submitButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:width="200dp"
+        android:height="45dp"
+        android:background="#005A7F"
+        android:textColor="@color/cardview_light_background"
+        android:text="Submit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/otpInput" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
