@@ -42,21 +42,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        paybizController = new PaybizController(this, this);
-//        FileLogger.initialize(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        paybizController.initialize();
-        paybizController.createTransaction("abc", "1.2.2");
-        System.out.println(paybizController.getAuthParams());
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("abc", "abc");
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-        paybizController.doChallenge(this, jsonObject);
+//        paybizController.initialize();
+//        paybizController.createTransaction("abc", "1.2.2");
+//        System.out.println(paybizController.getAuthParams());
+//
+//        JSONObject jsonObject = new JSONObject();
+//        try {
+//            jsonObject.put("abc", "abc");
+//        } catch (JSONException e) {
+//            throw new RuntimeException(e);
+//        }
+//        paybizController.doChallenge(this, jsonObject);
 //        progressDialog.show();
 //        final Handler handler = new Handler();
 //        handler.postDelayed(new Runnable() {

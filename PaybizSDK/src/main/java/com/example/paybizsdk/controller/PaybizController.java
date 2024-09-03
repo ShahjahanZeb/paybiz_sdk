@@ -15,6 +15,7 @@ import com.example.paybizsdk.constants.UICustomizationType;
 import com.example.paybizsdk.entity.AuthenticationRequestParameters;
 import com.example.paybizsdk.entity.ButtonCustomization;
 import com.example.paybizsdk.entity.ChallengeParameters;
+import com.example.paybizsdk.entity.ChallengeStatusReceiver;
 import com.example.paybizsdk.entity.LabelCustomization;
 import com.example.paybizsdk.entity.TextBoxCustomization;
 import com.example.paybizsdk.entity.ToolbarCustomization;
@@ -23,6 +24,7 @@ import com.example.paybizsdk.interfaces.Controller;
 import com.example.paybizsdk.interfaces.Transaction;
 import com.example.paybizsdk.service.ConfigParameters;
 import com.example.paybizsdk.service.ThreeDSService;
+import com.example.paybizsdk.service.TransactionService;
 import com.example.paybizsdk.service.UiCustomization;
 
 import org.json.JSONException;
@@ -43,6 +45,7 @@ public class PaybizController implements Controller {
     private Context context;
 
     private ThreeDSService threeDSService;
+    private TransactionService transactionService;
 
     public PaybizController(Activity activity, Context context) {
         this.activity = activity;
@@ -152,7 +155,8 @@ public class PaybizController implements Controller {
     @Override
     public Transaction createTransaction(String directoryServerID, String messageVersion) {
         FileLogger.log("INFO", TAG, "--- In Create Transaction ---");
-        return threeDSService.createTransaction(directoryServerID, messageVersion);
+        transactionService = (TransactionService) threeDSService.createTransaction(directoryServerID, messageVersion);
+        return transactionService;
     }
 
     @Override
@@ -174,10 +178,11 @@ public class PaybizController implements Controller {
     }
 
     @Override
-    public void doChallenge(Activity activity, JSONObject json) {
+    public void doChallenge(Activity activity, ChallengeParameters challengeParameters, ChallengeStatusReceiver challengeStatusReceiver,
+                            int timeOut) {
         FileLogger.log("INFO", TAG, "--- In Do Challenge ---");
         try {
-            threeDSService.doChallenge(activity, json);
+            transactionService.doChallenge(activity, challengeParameters, null, 199);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

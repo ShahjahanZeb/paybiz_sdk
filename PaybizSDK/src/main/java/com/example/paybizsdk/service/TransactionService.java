@@ -1,11 +1,14 @@
 package com.example.paybizsdk.service;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 
 import com.example.paybizsdk.Logger.FileLogger;
 import com.example.paybizsdk.OTPScreen;
+import com.example.paybizsdk.TransactionResult;
 import com.example.paybizsdk.constants.SDKConstants;
 import com.example.paybizsdk.entity.AuthenticationRequestParameters;
 import com.example.paybizsdk.entity.ChallengeParameters;
@@ -38,10 +41,12 @@ public class TransactionService implements Transaction {
     private String messageVersion;
 
     private JSONObject areqJson;
+    DatabaseService databaseService;
 
     private static final String TAG = "TransactionService";
 
-    public TransactionService(){}
+    public TransactionService() {
+    }
 
     public TransactionService(Activity activity, Context context, String SDKAppID, String SDKEmpheralPublicKey, String messageVersion) {
         this.threeDS2Service = new ThreeDSService();
@@ -50,6 +55,7 @@ public class TransactionService implements Transaction {
         this.SDKAppID = SDKAppID;
         this.SDKEmpheralPublicKey = SDKEmpheralPublicKey;
         this.messageVersion = messageVersion;
+        this.databaseService = new DatabaseService(context);
     }
 
     @Override
@@ -58,49 +64,73 @@ public class TransactionService implements Transaction {
         return new AuthenticationRequestParameters(String.valueOf(ThreeDSService.deviceInformation), SDKConstants.SDK_TRANS_ID, this.SDKAppID, SDKConstants.SDK_REF_NUM, null, null);
     }
 
+    @SuppressLint("Range")
     @Override
     public void doChallenge(Activity currentActivity, ChallengeParameters challengeParameters,
                             ChallengeStatusReceiver challengeStatusReceiver, int timeOut)
             throws InvalidInputException, JSONException {
+        String acsURL = "";
         FileLogger.log("INFO", TAG, "--- In Do Challenge ---");
         if (this.SDKEmpheralPublicKey == null) {
             throw new RuntimeException("SDK Empheral Public Key not found");
         }
-        JSONObject areq = this.getAreqJson();
-        String acsURL = areq.getString("acsURL");
-
         JSONObject creqJson = new JSONObject();
         creqJson.put("threeDSServerTransID", challengeParameters.getThreeDSServerTransactionId());
         creqJson.put("acsTransID", challengeParameters.getAcsTransactionId());
-        creqJson.put("challengeNoEntry", "false");
         creqJson.put("challengeWindowSize", "05");
         creqJson.put("messageType", "CReq");
-        creqJson.put("messageVersion", "2.2.0");
-        creqJson.put("oobContinue", "false");
+        creqJson.put("messageVersion", SDKConstants.Message_VERSION);
+//        creqJson.put("oobContinue", "true");
         creqJson.put("resendChallenge", "N");
-        creqJson.put("sdkTransID", areq.getString("sdkTransID"));
-        creqJson.put("sdkCounterStoA", "05");
-        creqJson.put("whitelistingDataEntry", "SampleWhitelistEntry");
-        System.out.println("Creq Json: "+creqJson);
+        creqJson.put("sdkTransID", challengeParameters.getSdkTransID());
+        creqJson.put("sdkCounterStoA", "001");
+        creqJson.put("whitelistingDataEntry", "Y");
+        creqJson.put("oobAppURLInd", "01");
+        creqJson.put("threeDSRequestorAppURL", "https://developer.android.com/training/app-links");
+        System.out.println("CReq Json: " + creqJson);
+        try {
+            Cursor cursor = databaseService.getLastTransaction();
+            if(cursor != null) {
+                if(cursor.moveToFirst()) {
+                    acsURL = cursor.getString(cursor.getColumnIndex("acsURL"));
+                }
+            }
+        } catch (Exception e) {
+            FileLogger.log("ERROR", TAG, "Error in fetching ACS URL" + e.getMessage());
+        }
+        FileLogger.log("INFO", TAG, "CReq Prepared: " + creqJson.toString());
+        FileLogger.log("INFO", TAG, "CReq Call To: " + acsURL);
         PostRequestTask postRequestCallable = new PostRequestTask(acsURL, "creq", new String(Base64.getEncoder().encodeToString(creqJson.toString().getBytes())));
         FutureTask<String> futureTask = new FutureTask<>(postRequestCallable);
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(futureTask);
-        FileLogger.log("INFO", TAG , "CREQ REC");
+        FileLogger.log("INFO", TAG, "CRes Received");
+        JSONObject cresObject = null;
         try {
             String response = futureTask.get();
-            System.out.println("Initial CReq Response: "+response);
-        } catch (InterruptedException | ExecutionException e) {
+            System.out.println("Initial CReq Response: " + response);
+            if (response != null) {
+                cresObject = new JSONObject(response);
+            }
+        } catch (InterruptedException | ExecutionException | JSONException e) {
             e.printStackTrace();
         }
-        Intent intent = new Intent(currentActivity, OTPScreen.class);
-        intent.putExtra("header", "LOGIBIZ");
-        intent.putExtra("label", "OTP Screen");
-        intent.putExtra("text", "Enter OTP Screen");
-        intent.putExtra("creq", creqJson.toString());
-        intent.putExtra("acsUrl", acsURL);
-        currentActivity.startActivity(intent);
-}
+        if (cresObject != null && (cresObject.has("acsUiType") &&
+                cresObject.getString("acsUiType").equalsIgnoreCase("01"))) {
+            Intent intent = new Intent(currentActivity, OTPScreen.class);
+            intent.putExtra("header", cresObject.has("challengeInfoHeader") ? cresObject.getString("challengeInfoHeader") : "Alt Header");
+            intent.putExtra("label", cresObject.has("challengeInfoLabel") ? cresObject.getString("challengeInfoLabel") : "Alt Label");
+            intent.putExtra("text", cresObject.has("challengeInfoText") ? cresObject.getString("challengeInfoText") : "Alt Info Text");
+            intent.putExtra("textIndicator", cresObject.has("challengeInfoTextIndicator") ? cresObject.getString("challengeInfoTextIndicator") : "N");
+            intent.putExtra("creq", creqJson.toString());
+            intent.putExtra("acsUrl", acsURL);
+            currentActivity.startActivity(intent);
+        } else {
+            Intent intent = new Intent(currentActivity, TransactionResult.class);
+            intent.putExtra("transStatus", "Error while connecting ACS");
+            currentActivity.startActivity(intent);
+        }
+    }
 
     @Override
     public ProgressDialog getProgressView(Activity currentActivity) {

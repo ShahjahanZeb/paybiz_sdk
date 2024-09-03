@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TransactionResult"
-    android:background="@color/cardview_light_background">
+    android:background="@drawable/page_border"
+    tools:context=".TransactionResult">
 
     <TextView
         android:id="@+id/textView"
@@ -28,116 +28,178 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="560dp"
-        android:text="Card Holder Name:"
+        android:text="Payment Id:"
         android:textColor="@android:color/background_dark"
-        android:textFontWeight="2000"
+        android:textFontWeight="800"
         android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.062"
+        app:layout_constraintHorizontal_bias="0.077"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
         app:layout_constraintVertical_bias="0.597" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/paymentId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="shah"
+        android:text="111111"
         android:textColor="@android:color/darker_gray"
+        android:textFontWeight="700"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.040"
+        app:layout_constraintHorizontal_bias="0.077"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4"
-        app:layout_constraintVertical_bias="0.01" />
+        app:layout_constraintVertical_bias="0.019" />
 
     <TextView
         android:id="@+id/textView6"
-        android:layout_width="76dp"
-        android:layout_height="19dp"
-        android:text="Currency:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SDK Trans Id:"
         android:textColor="@android:color/background_dark"
-        android:textFontWeight="2000"
+        android:textFontWeight="700"
         android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.038"
+        app:layout_constraintHorizontal_bias="0.077"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5"
-        app:layout_constraintVertical_bias="0.031" />
+        app:layout_constraintTop_toBottomOf="@+id/paymentId"
+        app:layout_constraintVertical_bias="0.033" />
 
     <TextView
-        android:id="@+id/textView7"
+        android:id="@+id/sdkTransId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="840"
+        android:text="1234567889-1234498871"
+        android:textFontWeight="700"
         android:textColor="@android:color/darker_gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.033"
+        app:layout_constraintHorizontal_bias="0.077"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView6"
-        app:layout_constraintVertical_bias="0.011" />
+        app:layout_constraintVertical_bias="0.02" />
 
     <TextView
         android:id="@+id/textView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Amount:"
+        android:text="Card Holder Name:"
         android:textColor="@android:color/background_dark"
-        android:textFontWeight="2000"
+        android:textFontWeight="700"
         android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.037"
+        app:layout_constraintHorizontal_bias="0.077"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7"
-        app:layout_constraintVertical_bias="0.022" />
+        app:layout_constraintTop_toBottomOf="@+id/sdkTransId"
+        app:layout_constraintVertical_bias="0.025" />
 
     <TextView
-        android:id="@+id/textView9"
+        android:id="@+id/ccName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="555"
+        android:text="shah"
         android:textColor="@android:color/darker_gray"
+        android:textFontWeight="700"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.031"
+        app:layout_constraintHorizontal_bias="0.077"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView8"
-        app:layout_constraintVertical_bias="0.001" />
+        app:layout_constraintVertical_bias="0.027" />
 
     <TextView
         android:id="@+id/textView10"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Result:"
+        android:text="Currency:"
         android:textColor="@android:color/background_dark"
-        android:textFontWeight="2000"
+        android:textFontWeight="700"
         android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.033"
+        app:layout_constraintHorizontal_bias="0.053"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView9"
-        app:layout_constraintVertical_bias="0.028" />
+        app:layout_constraintTop_toBottomOf="@+id/ccName"
+        app:layout_constraintVertical_bias="0.027" />
 
     <TextView
-        android:id="@+id/paymentResult"
+        android:id="@+id/currency"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Payment Successful!"
+        android:text="SAR"
         android:textColor="@android:color/darker_gray"
+        android:textFontWeight="700"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.039"
+        app:layout_constraintHorizontal_bias="0.049"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView10"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.024" />
+
+    <TextView
+        android:id="@+id/amountHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Amount"
+        android:textColor="@android:color/background_dark"
+        android:textFontWeight="700"
+        android:textSize="18dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.054"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/currency"
+        app:layout_constraintVertical_bias="0.039" />
+
+    <TextView
+        android:id="@+id/amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="500"
+        android:textColor="@android:color/darker_gray"
+        android:textFontWeight="700"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.049"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/amountHeading"
+        app:layout_constraintVertical_bias="0.023" />
+
+    <TextView
+        android:id="@+id/authStatusHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Authentication Status: "
+        android:textColor="@android:color/background_dark"
+        android:textFontWeight="700"
+        android:textSize="18dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.083"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/amount"
+        app:layout_constraintVertical_bias="0.048" />
+
+    <TextView
+        android:id="@+id/authStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Y"
+        android:textFontWeight="700"
+        android:textSize="18dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.045"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/authStatusHeading"
+        app:layout_constraintVertical_bias="0.047" />
 
     <Button
-        android:id="@+id/backBtn"
+        android:id="@+id/backButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:width="360dp"
@@ -149,7 +211,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/paymentResult"
-        app:layout_constraintVertical_bias="0.144" />
+        app:layout_constraintTop_toBottomOf="@+id/authStatus"
+        app:layout_constraintVertical_bias="0.57" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

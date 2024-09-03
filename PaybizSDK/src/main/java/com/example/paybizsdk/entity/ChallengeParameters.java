@@ -8,7 +8,6 @@ public class ChallengeParameters {
     private String threeDSRequestorAppURL;
     private String sdkTransID;
 
-
     public String getThreeDSServerTransactionId() {
         return threeDSServerTransactionId;
     }
