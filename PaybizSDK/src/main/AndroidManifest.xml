@@ -14,10 +14,13 @@
 
     <application>
         <activity
-            android:name=".TransactionResult"
+            android:name=".screens.OOBConfirmationScreen"
             android:exported="false" />
         <activity
-            android:name=".OTPScreen"
+            android:name=".screens.TransactionResult"
+            android:exported="false" />
+        <activity
+            android:name=".screens.OTPScreen"
             android:exported="false" />
     </application>
 

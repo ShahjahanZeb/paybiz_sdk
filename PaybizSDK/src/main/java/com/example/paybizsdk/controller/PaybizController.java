@@ -192,4 +192,9 @@ public class PaybizController implements Controller {
         FileLogger.log("INFO", TAG, "--- In Authentication Params ---");
         return threeDSService.getParams();
     }
+
+    public void oobFlow(Activity activity){
+        FileLogger.log("INFO", TAG, "--- In OOB FLOW, SDK CALLED AGAIN ---");
+        transactionService.sendOOBFinalCReq(activity);
+    }
 }
