@@ -1,6 +1,7 @@
 package com.example.paybizsdk.screens;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -37,11 +38,11 @@ import java.util.concurrent.FutureTask;
 public class OTPScreen extends AppCompatActivity {
 
     private static final String TAG = "OTPScreen";
-    private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText, whyInfo;
+    private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText, whyInfo, expandInfo;
     private EditText otpInput;
     private Button submitButton, backButton;
 
-    private ImageView issuerImage, paymentScheme;
+    private ImageView issuerImage, paymentScheme, warningImage;
 
     private String acsUrl = "";
     JSONObject creqJson = null;
@@ -58,10 +59,12 @@ public class OTPScreen extends AppCompatActivity {
         submitButton = findViewById(R.id.submitButton);
         backButton = findViewById(R.id.backButton);
         challengeInfoText.setTextColor(Color.BLACK);
-        challengeInfoText.setTextSize(12f);
+//        challengeInfoText.setTextSize(12f);
         issuerImage = findViewById(R.id.paymentLogo);
         paymentScheme = findViewById(R.id.imageView);
         whyInfo = findViewById(R.id.whyInfoLabel);
+        expandInfo = findViewById(R.id.expandInfoLabel);
+        warningImage = findViewById(R.id.warning);
         Intent intent = getIntent();
         if (intent != null) {
             FileLogger.log("INFO", TAG, "Fetching Intent Values");
@@ -84,6 +87,7 @@ public class OTPScreen extends AppCompatActivity {
                 challengeInfoText.setLineSpacing(5, 1f);
             }
             whyInfo.setText(whyInfoLabel);
+            expandInfo.setText(expandInfoLabel);
             submitButton.setText(submitAuthenticationLabel);
             System.out.println("\n\nImages URL: " + issuerImageContent + "\n" + psImage);
             new DownloadImagesTask(issuerImage, paymentScheme).execute(issuerImageContent, psImage);
@@ -143,12 +147,7 @@ public class OTPScreen extends AppCompatActivity {
                     finish();
                 } else if (!transResult.equalsIgnoreCase("Y") && Integer.parseInt(counter) < 010) {
                     challengeInfoText.setText("The code you entered is incorrect please try again.");
-                    String text = "(i)   The code you entered is incorrect please try again.";
-                    SpannableString spannable = new SpannableString(text);
-                    int startIndex = text.indexOf("(i)");
-                    int endIndex = startIndex + "(i)".length();
-                    spannable.setSpan(new ForegroundColorSpan(Color.RED), startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    spannable.setSpan(new AbsoluteSizeSpan(15, true), startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    warningImage.setImageDrawable(ContextCompat.getDrawable(this, R.mipmap.ic_warning_foreground));
                     FileLogger.log("INFO", TAG, "Invalid OTP Entered by User");
                     int count = Integer.parseInt(counter);
                     count++;
