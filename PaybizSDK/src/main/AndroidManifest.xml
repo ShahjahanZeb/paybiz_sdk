@@ -11,4 +11,23 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application>
+        <activity
+            android:name=".screens.SingleSelectScreen"
+            android:exported="false" />
+        <activity
+            android:name=".screens.HTMLRender"
+            android:exported="false" />
+        <activity
+            android:name=".screens.OOBConfirmationScreen"
+            android:exported="false" />
+        <activity
+            android:name=".screens.TransactionResult"
+            android:exported="false" />
+        <activity
+            android:name=".screens.OTPScreen"
+            android:exported="false" />
+    </application>
+
 </manifest>

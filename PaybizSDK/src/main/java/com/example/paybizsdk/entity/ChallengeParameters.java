@@ -6,7 +6,7 @@ public class ChallengeParameters {
     private String acsTransactionId;
     private String acsRefNumber;
     private String threeDSRequestorAppURL;
-
+    private String sdkTransID;
 
     public String getThreeDSServerTransactionId() {
         return threeDSServerTransactionId;
@@ -38,5 +38,13 @@ public class ChallengeParameters {
 
     public void setThreeDSRequestorAppURL(String threeDSRequestorAppURL) {
         this.threeDSRequestorAppURL = threeDSRequestorAppURL;
+    }
+
+    public String getSdkTransID() {
+        return sdkTransID;
+    }
+
+    public void setSdkTransID(String sdkTransID) {
+        this.sdkTransID = sdkTransID;
     }
 }

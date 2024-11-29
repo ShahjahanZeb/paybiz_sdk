@@ -183,10 +183,15 @@ public class ThreeDSService implements ThreeDS2Service {
     }
 
 
-    public void doChallenge(Activity activity, ChallengeParameters challengeParameters, JSONObject json) throws JSONException {
-        transactionService.setAresJson(json);
-        transactionService.doChallenge(activity, challengeParameters, null, 5000);
-    }
+//    public void doChallenge(Activity currentActivity, JSONObject json) throws JSONException {
+//        ChallengeParameters challengeParameters = new ChallengeParameters();
+//        challengeParameters.setThreeDSServerTransactionId(json.getString("threeDSServerTransID"));
+//        challengeParameters.setAcsTransactionId(json.getString("acsTransID"));
+//        challengeParameters.setAcsRefNumber(json.getString("acsReferenceNumber"));
+//        challengeParameters.setSdkTransID(json.getString("sdkTransID"));
+//        transactionService.setAreqJson(json);
+//        transactionService.doChallenge(currentActivity, challengeParameters, null, 5000);
+//    }
 
     public AuthenticationRequestParameters getParams(){
        return transactionService.getAuthenticationRequestParameters();

@@ -10,4 +10,10 @@ public class SDKConstants {
 
     public static final String SECRET_KEY = "secret";
 
+    public static final String Message_VERSION = "2.2.0";
+
+    public static final String SDK_APP_ID = "3847493Abc";
+
+    public static final String RESEND_OTP_URL = "/resend-otp/";
+
 }

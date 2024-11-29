@@ -15,6 +15,7 @@ import com.example.paybizsdk.constants.UICustomizationType;
 import com.example.paybizsdk.entity.AuthenticationRequestParameters;
 import com.example.paybizsdk.entity.ButtonCustomization;
 import com.example.paybizsdk.entity.ChallengeParameters;
+import com.example.paybizsdk.entity.ChallengeStatusReceiver;
 import com.example.paybizsdk.entity.LabelCustomization;
 import com.example.paybizsdk.entity.TextBoxCustomization;
 import com.example.paybizsdk.entity.ToolbarCustomization;
@@ -23,6 +24,7 @@ import com.example.paybizsdk.interfaces.Controller;
 import com.example.paybizsdk.interfaces.Transaction;
 import com.example.paybizsdk.service.ConfigParameters;
 import com.example.paybizsdk.service.ThreeDSService;
+import com.example.paybizsdk.service.TransactionService;
 import com.example.paybizsdk.service.UiCustomization;
 
 import org.json.JSONException;
@@ -43,6 +45,7 @@ public class PaybizController implements Controller {
     private Context context;
 
     private ThreeDSService threeDSService;
+    private TransactionService transactionService;
 
     public PaybizController(Activity activity, Context context) {
         this.activity = activity;
@@ -54,28 +57,6 @@ public class PaybizController implements Controller {
     @Override
     public void initialize() {
         requestBluetoothConnectPermission();
-    }
-
-    public void init() {
-        FileLogger.log("INFO", TAG, "--- In Initialize Method ---");
-        UiCustomization uiCustomization = new UiCustomization();
-        ButtonCustomization btnCustomization = new ButtonCustomization();
-        btnCustomization.setTextColor("#FF00FF");
-        ToolbarCustomization toolbarCustomization = new ToolbarCustomization();
-        toolbarCustomization.setBackgroundColor("#FF00FF");
-        LabelCustomization lblCustomization = new LabelCustomization();
-        lblCustomization.setTextColor("#FF00FF");
-        TextBoxCustomization txtboxCustomization = new TextBoxCustomization();
-        txtboxCustomization.setTextColor("#FF00FF");
-        uiCustomization.setButtonCustomization(btnCustomization, ButtonType.NEXT);
-        uiCustomization.setToolBarCustomization(toolbarCustomization);
-        uiCustomization.setLabelCustomization(lblCustomization);
-        uiCustomization.setTextBoxCustomization(txtboxCustomization);
-        Map<UICustomizationType, UiCustomization> uiCustomizationMap = new HashMap<>();
-        uiCustomizationMap.put(UICustomizationType.DEFAULT, uiCustomization);
-        String locale = Locale.getDefault().toString();
-        ConfigParameters configParameters = new ConfigParameters();
-        threeDSService.initialize(this.context, configParameters, locale, uiCustomizationMap);
     }
 
     private void requestBluetoothConnectPermission() {
@@ -149,10 +130,33 @@ public class PaybizController implements Controller {
         }
     }
 
+    public void init() {
+        FileLogger.log("INFO", TAG, "--- In Initialize Method ---");
+        UiCustomization uiCustomization = new UiCustomization();
+        ButtonCustomization btnCustomization = new ButtonCustomization();
+        btnCustomization.setTextColor("#FF00FF");
+        ToolbarCustomization toolbarCustomization = new ToolbarCustomization();
+        toolbarCustomization.setBackgroundColor("#FF00FF");
+        LabelCustomization lblCustomization = new LabelCustomization();
+        lblCustomization.setTextColor("#FF00FF");
+        TextBoxCustomization txtboxCustomization = new TextBoxCustomization();
+        txtboxCustomization.setTextColor("#FF00FF");
+        uiCustomization.setButtonCustomization(btnCustomization, ButtonType.NEXT);
+        uiCustomization.setToolBarCustomization(toolbarCustomization);
+        uiCustomization.setLabelCustomization(lblCustomization);
+        uiCustomization.setTextBoxCustomization(txtboxCustomization);
+        Map<UICustomizationType, UiCustomization> uiCustomizationMap = new HashMap<>();
+        uiCustomizationMap.put(UICustomizationType.DEFAULT, uiCustomization);
+        String locale = Locale.getDefault().toString();
+        ConfigParameters configParameters = new ConfigParameters();
+        threeDSService.initialize(this.context, configParameters, locale, uiCustomizationMap);
+    }
+
     @Override
     public Transaction createTransaction(String directoryServerID, String messageVersion) {
         FileLogger.log("INFO", TAG, "--- In Create Transaction ---");
-        return threeDSService.createTransaction(directoryServerID, messageVersion);
+        transactionService = (TransactionService) threeDSService.createTransaction(directoryServerID, messageVersion);
+        return transactionService;
     }
 
     @Override
@@ -173,11 +177,24 @@ public class PaybizController implements Controller {
         return threeDSService.getWarnings();
     }
 
-    public void doChallenge(Activity activity, ChallengeParameters challengeParameters, JSONObject json) throws JSONException {
-        threeDSService.doChallenge(activity, challengeParameters, json);
+    @Override
+    public void doChallenge(Activity activity, ChallengeParameters challengeParameters, ChallengeStatusReceiver challengeStatusReceiver,
+                            int timeOut) {
+        FileLogger.log("INFO", TAG, "--- In Do Challenge ---");
+        try {
+            transactionService.doChallenge(activity, challengeParameters, null, 199);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public AuthenticationRequestParameters getAuthParams(){
+        FileLogger.log("INFO", TAG, "--- In Authentication Params ---");
         return threeDSService.getParams();
+    }
+
+    public void oobFlow(Activity activity){
+        FileLogger.log("INFO", TAG, "--- In OOB FLOW, SDK CALLED AGAIN ---");
+        transactionService.sendOOBFinalCReq(activity);
     }
 }
