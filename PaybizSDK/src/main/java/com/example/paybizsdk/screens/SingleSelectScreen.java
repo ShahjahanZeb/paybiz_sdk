@@ -69,6 +69,7 @@ public class SingleSelectScreen extends AppCompatActivity {
             public void onClick(View v) {
                 FileLogger.log("INFO", TAG, "Email Radio Clicked");
                 challengeDataEntry = "email";
+                submitButton.setBackgroundColor(Color.parseColor("#005A7F"));
                 submitButton.setEnabled(true);
 //                mobileButton.getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
 //                emailButton.setColor
@@ -81,6 +82,7 @@ public class SingleSelectScreen extends AppCompatActivity {
             public void onClick(View v) {
                 FileLogger.log("INFO", TAG, "Mobile Radio Clicked");
                 challengeDataEntry = "mobile";
+                submitButton.setBackgroundColor(Color.parseColor("#005A7F"));
                 submitButton.setEnabled(true);
 //                emailButton.getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
 //                mobileButton.getBackground().setColorFilter(Color.parseColor("#064C70"), PorterDuff.Mode.SRC_IN);

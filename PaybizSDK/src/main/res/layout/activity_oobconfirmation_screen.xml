@@ -126,7 +126,7 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:width="350sp"
+        android:width="340sp"
         android:height="45sp"
         android:background="@drawable/button_background"
         android:text=""
@@ -154,23 +154,6 @@
         app:layout_constraintTop_toBottomOf="@+id/button"
         app:layout_constraintVertical_bias="0.3" />
 
-
-    <TextView
-        android:id="@+id/expandInfoLabel"
-        android:layout_width="300sp"
-        android:layout_height="wrap_content"
-        android:textColor="@color/cardview_dark_background"
-        android:textSize="16sp"
-        android:layout_marginLeft="30sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/whyInfoLabel"
-        app:layout_constraintVertical_bias="0.15" />
-
-
     <TextView
         android:id="@+id/whyInfoLabelArrow"
         android:layout_width="wrap_content"
@@ -186,20 +169,6 @@
         app:layout_constraintTop_toBottomOf="@+id/button"
         app:layout_constraintVertical_bias="0.31" />
 
-    <TextView
-        android:id="@+id/expandInfoLabelArrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="\u2193"
-        android:textColor="@color/cardview_dark_background"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.633"
-        app:layout_constraintStart_toEndOf="@+id/expandInfoLabel"
-        app:layout_constraintTop_toBottomOf="@+id/whyInfoLabelArrow"
-        app:layout_constraintVertical_bias="0.108" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

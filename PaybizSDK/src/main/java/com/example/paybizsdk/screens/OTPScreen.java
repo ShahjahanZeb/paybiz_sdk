@@ -36,8 +36,7 @@ import java.util.concurrent.FutureTask;
 public class OTPScreen extends AppCompatActivity {
 
     private static final String TAG = "OTPScreen";
-    private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText, whyInfo, expandInfo, whyInfoLabelArrow,
-            expandInfoLabelArrow, resendButton;
+    private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText, whyInfo, whyInfoLabelArrow, resendButton;
     private EditText otpInput;
     private Button submitButton, backButton;
 
@@ -62,10 +61,8 @@ public class OTPScreen extends AppCompatActivity {
         issuerImage = findViewById(R.id.paymentLogo);
         paymentScheme = findViewById(R.id.imageView);
         whyInfo = findViewById(R.id.whyInfoLabel);
-        expandInfo = findViewById(R.id.expandInfoLabel);
         warningImage = findViewById(R.id.warning);
         whyInfoLabelArrow = findViewById(R.id.whyInfoLabelArrow);
-        expandInfoLabelArrow = findViewById(R.id.expandInfoLabelArrow);
         resendButton = findViewById(R.id.resendButton);
         Intent intent = getIntent();
         String acsTransId = "";
@@ -79,7 +76,6 @@ public class OTPScreen extends AppCompatActivity {
             String psImage = intent.getStringExtra("psImage");
             String submitAuthenticationLabel = intent.getStringExtra("submitAuthenticationLabel");
             String whyInfoLabel = intent.getStringExtra("whyInfoLabel");
-            String expandInfoLabel = intent.getStringExtra("expandInfoLabel");
             acsUrl = intent.getStringExtra("acsUrl");
             acsTransId = intent.getStringExtra("acsTransID");
             FileLogger.log("VERBOSE", TAG, "Values stored in Variables");
@@ -91,12 +87,8 @@ public class OTPScreen extends AppCompatActivity {
                 challengeInfoText.setLineSpacing(5, 1f);
             }
             whyInfo.setText(whyInfoLabel);
-            expandInfo.setText(expandInfoLabel);
             if (whyInfoLabel.isEmpty() || whyInfoLabel.equals("") || whyInfoLabel == null) {
                 whyInfoLabelArrow.setText("");
-            }
-            if (expandInfoLabel.isEmpty() || expandInfoLabel.equals("") || expandInfoLabel == null) {
-                expandInfoLabelArrow.setText("");
             }
             submitButton.setText(submitAuthenticationLabel);
             System.out.println("\n\nImages URL: " + issuerImageContent + "\n" + psImage);
@@ -163,7 +155,7 @@ public class OTPScreen extends AppCompatActivity {
                     finish();
                 } else if (!transResult.equalsIgnoreCase("Y") && Integer.parseInt(counter) < 010) {
                     challengeInfoText.setText("The code you entered is incorrect please try again.");
-                    warningImage.setImageDrawable(ContextCompat.getDrawable(this, R.mipmap.ic_warning_foreground));
+                    warningImage.setImageDrawable(ContextCompat.getDrawable(this, R.mipmap.ic_warning_round_foreground));
                     FileLogger.log("INFO", TAG, "Invalid OTP Entered by User");
                     int count = Integer.parseInt(counter);
                     count++;

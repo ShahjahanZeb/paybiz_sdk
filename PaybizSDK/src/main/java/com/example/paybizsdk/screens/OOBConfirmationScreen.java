@@ -29,7 +29,7 @@ import java.util.logging.Level;
 
 public class OOBConfirmationScreen extends AppCompatActivity {
 
-    TextView challengeInfoHeader, challengeInfoText, whyInfo, expandInfo, whyInfoLabelArrow, expandInfoLabelArrow;
+    TextView challengeInfoHeader, challengeInfoText, whyInfo, whyInfoLabelArrow;
     Button button, backButton;
 
     private final String TAG = "OOB Confirmation Screen";
@@ -54,9 +54,7 @@ public class OOBConfirmationScreen extends AppCompatActivity {
             issuerImage = findViewById(R.id.yourBank);
             paymentScheme = findViewById(R.id.paymentScheme);
             whyInfo = findViewById(R.id.whyInfoLabel);
-            expandInfo = findViewById(R.id.expandInfoLabel);
             whyInfoLabelArrow = findViewById(R.id.whyInfoLabelArrow);
-            expandInfoLabelArrow = findViewById(R.id.expandInfoLabelArrow);
             Intent intent = getIntent();
             String infoHeader = intent.getStringExtra("challengeInfoHeader");
             String infoText = intent.getStringExtra("challengeInfoText"), updatedInfoText = "";
@@ -76,12 +74,8 @@ public class OOBConfirmationScreen extends AppCompatActivity {
             challengeInfoText.setLineSpacing(5, 1f);
             button.setText(appLabel);
             whyInfo.setText(whyInfoLabel);
-            expandInfo.setText(expandInfoLabel);
             if (whyInfoLabel.isEmpty() || whyInfoLabel.equals("") || whyInfoLabel == null) {
                 whyInfoLabelArrow.setText("");
-            }
-            if (expandInfoLabel.isEmpty() || expandInfoLabel.equals("") || expandInfoLabel == null) {
-                expandInfoLabelArrow.setText("");
             }
             DatabaseService databaseService = new DatabaseService(this);
             Cursor cursor = databaseService.getLastTransaction();
