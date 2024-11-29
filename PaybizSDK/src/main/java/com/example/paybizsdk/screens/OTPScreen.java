@@ -9,11 +9,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.ForegroundColorSpan;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,11 +16,14 @@ import android.widget.TextView;
 
 import com.example.paybizsdk.Logger.FileLogger;
 import com.example.paybizsdk.R;
+import com.example.paybizsdk.constants.SDKConstants;
+import com.example.paybizsdk.utility.ApiClient;
 import com.example.paybizsdk.utility.PostRequestTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -38,7 +36,8 @@ import java.util.concurrent.FutureTask;
 public class OTPScreen extends AppCompatActivity {
 
     private static final String TAG = "OTPScreen";
-    private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText, whyInfo, expandInfo;
+    private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText, whyInfo, expandInfo, whyInfoLabelArrow,
+            expandInfoLabelArrow, resendButton;
     private EditText otpInput;
     private Button submitButton, backButton;
 
@@ -65,7 +64,11 @@ public class OTPScreen extends AppCompatActivity {
         whyInfo = findViewById(R.id.whyInfoLabel);
         expandInfo = findViewById(R.id.expandInfoLabel);
         warningImage = findViewById(R.id.warning);
+        whyInfoLabelArrow = findViewById(R.id.whyInfoLabelArrow);
+        expandInfoLabelArrow = findViewById(R.id.expandInfoLabelArrow);
+        resendButton = findViewById(R.id.resendButton);
         Intent intent = getIntent();
+        String acsTransId = "";
         if (intent != null) {
             FileLogger.log("INFO", TAG, "Fetching Intent Values");
             String header = intent.getStringExtra("challengeInfoHeader");
@@ -78,6 +81,7 @@ public class OTPScreen extends AppCompatActivity {
             String whyInfoLabel = intent.getStringExtra("whyInfoLabel");
             String expandInfoLabel = intent.getStringExtra("expandInfoLabel");
             acsUrl = intent.getStringExtra("acsUrl");
+            acsTransId = intent.getStringExtra("acsTransID");
             FileLogger.log("VERBOSE", TAG, "Values stored in Variables");
             if (header != null) challengeInfoHeader.setText(header);
             if (label != null) challengeInfoLabel.setText(label);
@@ -88,6 +92,12 @@ public class OTPScreen extends AppCompatActivity {
             }
             whyInfo.setText(whyInfoLabel);
             expandInfo.setText(expandInfoLabel);
+            if (whyInfoLabel.isEmpty() || whyInfoLabel.equals("") || whyInfoLabel == null) {
+                whyInfoLabelArrow.setText("");
+            }
+            if (expandInfoLabel.isEmpty() || expandInfoLabel.equals("") || expandInfoLabel == null) {
+                expandInfoLabelArrow.setText("");
+            }
             submitButton.setText(submitAuthenticationLabel);
             System.out.println("\n\nImages URL: " + issuerImageContent + "\n" + psImage);
             new DownloadImagesTask(issuerImage, paymentScheme).execute(issuerImageContent, psImage);
@@ -101,29 +111,35 @@ public class OTPScreen extends AppCompatActivity {
             throw new RuntimeException(e);
         }
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
+        backButton.setOnClickListener(v -> finish());
+
+        submitButton.setOnClickListener(v -> {
+            String otp = otpInput.getText().toString().trim();
+            if (otp.isEmpty()) {
+                otpInput.setError("Please enter the OTP");
+                return;
             }
+            FileLogger.log("VERBOSE", TAG, "OTP Entered By USER: " + otp);
+            try {
+                creqJson.put("challengeDataEntry", otp);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            sendCreqRequest();
         });
 
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String otp = otpInput.getText().toString().trim();
-                if (otp.isEmpty()) {
-                    otpInput.setError("Please enter the OTP");
-                    return;
-                }
-                FileLogger.log("VERBOSE", TAG, "OTP Entered By USER: " + otp);
+        String finalAcsTransId = acsTransId;
+        resendButton.setOnClickListener(v -> {
+            System.out.println("Resend Button Clicked: " + acsUrl + SDKConstants.RESEND_OTP_URL + finalAcsTransId);
+            ApiClient apiClient = new ApiClient();
+            new Thread(() -> {
                 try {
-                    creqJson.put("challengeDataEntry", otp);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                    FileLogger.log("VERBOSE", TAG, "Sending Request to ACS on URL: " + acsUrl + SDKConstants.RESEND_OTP_URL + finalAcsTransId);
+                    apiClient.get(acsUrl, SDKConstants.RESEND_OTP_URL + finalAcsTransId);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                sendCreqRequest();
-            }
+            }).start();
         });
     }
 

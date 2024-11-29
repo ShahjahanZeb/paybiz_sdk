@@ -19,7 +19,7 @@
         android:id="@+id/logoImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/ic_logibiz_logo"
+        android:src="@mipmap/ic_card_scheme_foreground"
         android:minHeight="100dp"
         android:minWidth="100dp"
         android:layout_marginTop="10dp"

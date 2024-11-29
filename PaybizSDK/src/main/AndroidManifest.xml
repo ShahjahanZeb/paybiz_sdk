@@ -14,6 +14,12 @@
 
     <application>
         <activity
+            android:name=".screens.SingleSelectScreen"
+            android:exported="false" />
+        <activity
+            android:name=".screens.HTMLRender"
+            android:exported="false" />
+        <activity
             android:name=".screens.OOBConfirmationScreen"
             android:exported="false" />
         <activity

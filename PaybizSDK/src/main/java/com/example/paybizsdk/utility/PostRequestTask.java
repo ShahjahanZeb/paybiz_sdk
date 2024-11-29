@@ -31,11 +31,20 @@ public class PostRequestTask implements Callable<String> {
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            if (key != null && !key.isEmpty()) {
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            } else {
+                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            }
             conn.setRequestProperty("Accept", "application/json");
             conn.setDoOutput(true);
 
-            String urlParameters = URLEncoder.encode(key, "UTF-8") + "=" + URLEncoder.encode(value, "UTF-8");
+            String urlParameters;
+            if (key != null && !key.isEmpty()) {
+                urlParameters = URLEncoder.encode(key, "UTF-8") + "=" + URLEncoder.encode(value, "UTF-8");
+            } else {
+                urlParameters = value;
+            }
 
             os = conn.getOutputStream();
             byte[] input = urlParameters.getBytes(StandardCharsets.UTF_8);

@@ -29,7 +29,7 @@ import java.util.logging.Level;
 
 public class OOBConfirmationScreen extends AppCompatActivity {
 
-    TextView challengeInfoHeader, challengeInfoText, whyInfo, expandInfo;
+    TextView challengeInfoHeader, challengeInfoText, whyInfo, expandInfo, whyInfoLabelArrow, expandInfoLabelArrow;
     Button button, backButton;
 
     private final String TAG = "OOB Confirmation Screen";
@@ -44,6 +44,7 @@ public class OOBConfirmationScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_oobconfirmation_screen);
         FileLogger.log("INFO", TAG, "OOB Confirmation Screen Opened");
+        String url = "", threeDSServerTransID = "", amount = "", currency = "";
         try {
             FileLogger.log("VERBOSE", TAG, "Fetching Data from Intent, Database and setting dynamically on Screen");
             challengeInfoHeader = findViewById(R.id.challengeInfoHeader);
@@ -54,6 +55,8 @@ public class OOBConfirmationScreen extends AppCompatActivity {
             paymentScheme = findViewById(R.id.paymentScheme);
             whyInfo = findViewById(R.id.whyInfoLabel);
             expandInfo = findViewById(R.id.expandInfoLabel);
+            whyInfoLabelArrow = findViewById(R.id.whyInfoLabelArrow);
+            expandInfoLabelArrow = findViewById(R.id.expandInfoLabelArrow);
             Intent intent = getIntent();
             String infoHeader = intent.getStringExtra("challengeInfoHeader");
             String infoText = intent.getStringExtra("challengeInfoText"), updatedInfoText = "";
@@ -61,23 +64,12 @@ public class OOBConfirmationScreen extends AppCompatActivity {
                 updatedInfoText = infoText.replace("\\n\\n", "\n");
             }
             String appLabel = intent.getStringExtra("oobAppLabel");
-            String url = intent.getStringExtra("oobAppUrl");
-            String threeDSServerTransID = intent.getStringExtra("threeDSServerTransID");
+            url = intent.getStringExtra("oobAppUrl");
+            threeDSServerTransID = intent.getStringExtra("threeDSServerTransID");
             String issuerImageContent = intent.getStringExtra("issuerImage");
             String psImage = intent.getStringExtra("psImage");
             String whyInfoLabel = intent.getStringExtra("whyInfoLabel");
             String expandInfoLabel = intent.getStringExtra("expandInfoLabel");
-            System.out.println("challengeInfoHeader: " + infoHeader);
-            System.out.println("challengeInfoText: " + infoText);
-            System.out.println("updatedInfoText: " + updatedInfoText);
-            System.out.println("oobAppLabel: " + appLabel);
-            System.out.println("oobAppUrl: " + url);
-            System.out.println("threeDSServerTransID: " + threeDSServerTransID);
-            System.out.println("issuerImage: " + issuerImageContent);
-            System.out.println("psImage: " + psImage);
-            System.out.println("whyInfoLabel: " + whyInfoLabel);
-            System.out.println("expandInfoLabel: " + expandInfoLabel);
-
             FileLogger.log("VERBOSE", TAG, "Values stored in Variables");
             challengeInfoHeader.setText(infoHeader);
             challengeInfoText.setText(updatedInfoText);
@@ -85,9 +77,14 @@ public class OOBConfirmationScreen extends AppCompatActivity {
             button.setText(appLabel);
             whyInfo.setText(whyInfoLabel);
             expandInfo.setText(expandInfoLabel);
+            if (whyInfoLabel.isEmpty() || whyInfoLabel.equals("") || whyInfoLabel == null) {
+                whyInfoLabelArrow.setText("");
+            }
+            if (expandInfoLabel.isEmpty() || expandInfoLabel.equals("") || expandInfoLabel == null) {
+                expandInfoLabelArrow.setText("");
+            }
             DatabaseService databaseService = new DatabaseService(this);
             Cursor cursor = databaseService.getLastTransaction();
-            String amount = "", currency = "";
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
                     FileLogger.log("VERBOSE", TAG, "Fetching values from Cursor");
@@ -104,26 +101,43 @@ public class OOBConfirmationScreen extends AppCompatActivity {
 
         FileLogger.log("VERBOSE", TAG, "OOB App URL: " + this.oobURL);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        String finalUrl = url;
+        String finalAmount = amount;
+        String finalCurrency = currency;
+        String finalThreeDSServerTransID = threeDSServerTransID;
+        button.setOnClickListener(v -> {
 //                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(oobURL));
 //                startActivity(browserIntent);
 //                Intent launchIntent = getPackageManager().getLaunchIntentForPackage(oobURL);
 //                startActivity(launchIntent);
-                Uri appUrl = Uri.parse(oobURL);
-                Intent appIntent = new Intent(Intent.ACTION_VIEW);
-                appIntent.setData(appUrl);
-                appIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Uri appUrl = Uri.parse(oobURL);
+            Intent appIntent = new Intent(Intent.ACTION_VIEW);
+            appIntent.setData(appUrl);
+            appIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try {
+                finish();
+                startActivity(appIntent);
+            } catch (ActivityNotFoundException e) {
+                Toast toast = new Toast(getBaseContext());
+                toast.setText("OOB App not found, redirecting to Web");
+                toast.setDuration(Toast.LENGTH_LONG);
+                toast.show();
+                FileLogger.log("ERROR", TAG, "Not able to open OOB App: " + e.getMessage());
+                String webURL = "https://staging.logibiztech.com:8777/oob/openoobApp?amount=" + finalAmount + "&currency=" + finalCurrency + "&threeDsRquestorAppUrl=myapp://localhost/path" + "&threeDSServerTransID=" + finalThreeDSServerTransID + "&timestamp=" + Utils.getUTCDateTime();
+                FileLogger.log("VERBOSE", TAG, "Redirecting User to Web" + e.getMessage());
+                Uri webURI = Uri.parse(webURL);
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+                browserIntent.setData(webURI);
+                browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 try {
-                    startActivity(appIntent);
-                } catch (ActivityNotFoundException e) {
-                    Toast toast = new Toast(getBaseContext());
-                    toast.setText("Not able to open OOB App" + e.getMessage());
-                    toast.setDuration(Toast.LENGTH_LONG);
-                    toast.show();
-                    FileLogger.log("ERROR", TAG, "Not able to open OOB App: " + e.getMessage());
-//                            (this, "ABc", Toast.LENGTH_LONG).show();
+                    finish();
+                    startActivity(browserIntent);
+                } catch (ActivityNotFoundException ex) {
+                    FileLogger.log("ERROR", TAG, "Not able to open OOB Website: " + ex.getMessage());
+                    Toast webToaster = new Toast(getBaseContext());
+                    webToaster.setText("Not able to open OOB Web");
+                    webToaster.setDuration(Toast.LENGTH_LONG);
+                    webToaster.show();
                 }
             }
         });

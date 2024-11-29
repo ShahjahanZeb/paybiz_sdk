@@ -14,4 +14,6 @@ public class SDKConstants {
 
     public static final String SDK_APP_ID = "3847493Abc";
 
+    public static final String RESEND_OTP_URL = "/resend-otp/";
+
 }

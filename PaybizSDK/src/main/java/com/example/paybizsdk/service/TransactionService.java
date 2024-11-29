@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.database.Cursor;
 
 import com.example.paybizsdk.Logger.FileLogger;
+import com.example.paybizsdk.screens.HTMLRender;
 import com.example.paybizsdk.screens.OOBConfirmationScreen;
 import com.example.paybizsdk.screens.OTPScreen;
+import com.example.paybizsdk.screens.SingleSelectScreen;
 import com.example.paybizsdk.screens.TransactionResult;
 import com.example.paybizsdk.constants.SDKConstants;
 import com.example.paybizsdk.entity.AuthenticationRequestParameters;
@@ -114,97 +116,106 @@ public class TransactionService implements Transaction {
             String response = futureTask.get();
             if (response != null) {
                 FileLogger.log("INFO", TAG, "CRes Received" + response);
-                cresObject = new JSONObject(response);
+                if(!response.contains("503")) {
+                    cresObject = new JSONObject(response);
+                }
             }
         } catch (InterruptedException | ExecutionException | JSONException e) {
             e.printStackTrace();
         }
         if (cresObject != null) {
-            if (cresObject.has("acsUiType") &&
-                    cresObject.getString("acsUiType").equalsIgnoreCase("01")) {
-                FileLogger.log("INFO", TAG, "UI TYPE = '01', OTP Case");
-                Intent intent = new Intent(currentActivity, OTPScreen.class);
-                intent.putExtra("challengeInfoHeader", cresObject.has("challengeInfoHeader")
-                        ? cresObject.getString("challengeInfoHeader") : "");
-                intent.putExtra("challengeInfoLabel", cresObject.has("challengeInfoLabel")
-                        ? cresObject.getString("challengeInfoLabel") : "");
-                intent.putExtra("challengeInfoText", cresObject.has("challengeInfoText")
-                        ? cresObject.getString("challengeInfoText") : "");
-                intent.putExtra("challengeInfoTextIndicator", cresObject.has("challengeInfoTextIndicator")
-                        ? cresObject.getString("challengeInfoTextIndicator") : "N");
-                // New fields
-                intent.putExtra("submitAuthenticationLabel", cresObject.has("submitAuthenticationLabel")
-                        ? cresObject.getString("submitAuthenticationLabel") : "Submit");
-                intent.putExtra("whyInfoLabel", cresObject.has("whyInfoLabel")
-                        ? cresObject.getString("whyInfoLabel") : "");
-                intent.putExtra("expandInfoLabel", cresObject.has("expandInfoLabel")
-                        ? cresObject.getString("expandInfoLabel") : "");
-                intent.putExtra("creq", creqJson.toString());
-                intent.putExtra("acsUrl", acsURL);
-                if (cresObject.has("issuerImage")) {
-                    JSONObject issuerImageObject = cresObject.getJSONObject("issuerImage");
-                    intent.putExtra("issuerImage", issuerImageObject.has("medium") && !issuerImageObject.getString("medium").isEmpty()
-                            ? issuerImageObject.getString("medium") : "");
-                } else {
-                    intent.putExtra("issuerImage", "https://i.ibb.co/3k6GPqc/logibiz-logo-300x-1.png");
+            String acsUiType = cresObject.optString("acsUiType", "");
+            String acsHTML = cresObject.optString("acsHTML", null);
+            if (acsUiType.equalsIgnoreCase("01") || acsUiType.equalsIgnoreCase("02")
+                    || acsUiType.equalsIgnoreCase("04") || acsUiType.equalsIgnoreCase("05")) {
+                boolean isOtpCase = acsUiType.equalsIgnoreCase("01"),
+                        isSingleSelectCase = acsUiType.equalsIgnoreCase("02"),
+                        isOobCase = acsUiType.equalsIgnoreCase("04");
+                String logMessage = "";
+                if (isOtpCase) {
+                    logMessage = "UI TYPE = '01', OTP Case";
+                } else if (isSingleSelectCase) {
+                    logMessage = "UI TYPE = '02', Single Select";
+                } else if (isOobCase) {
+                    logMessage = "UI TYPE = '04', OOB Case";
                 }
-                if (cresObject.has("psImage")) {
-                    JSONObject issuerImageObject = cresObject.getJSONObject("psImage");
-                    intent.putExtra("psImage", issuerImageObject.has("medium") && !issuerImageObject.getString("medium").isEmpty()
-                            ? issuerImageObject.getString("medium") : "");
+                FileLogger.log("INFO", TAG, logMessage);
+                if (acsHTML != null) {
+                    FileLogger.log("INFO", TAG, "HTML Render: " + logMessage);
+                    byte[] decodedBytes = Base64.getUrlDecoder().decode(acsHTML);
+                    String decodedString = new String(decodedBytes);
+                    Intent intent = new Intent(currentActivity, HTMLRender.class);
+                    intent.putExtra("htmlContent", decodedString);
+                    intent.putExtra("acsURL", acsURL);
+                    intent.putExtra("creqObject", creqJson.toString());
+                    if (!isOtpCase) {
+                        intent.putExtra("oobAppUrl", "oobApp://localhost/path");
+                    }
+                    currentActivity.startActivity(intent);
                 } else {
-                    intent.putExtra("psImage", "https://i.ibb.co/Fw9Gtrd/Picture1.png");
+                    Intent intent = null;
+                    if (isOtpCase) {
+                        intent = new Intent(currentActivity, OTPScreen.class);
+                    } else if (isOobCase) {
+                        intent = new Intent(currentActivity, OOBConfirmationScreen.class);
+                    } else if (isSingleSelectCase) {
+                        intent = new Intent(currentActivity, SingleSelectScreen.class);
+                    }
+                    intent.putExtra("challengeInfoHeader", cresObject.optString("challengeInfoHeader", ""));
+                    intent.putExtra("challengeInfoText", cresObject.optString("challengeInfoText", ""));
+                    intent.putExtra("whyInfoLabel", cresObject.optString("whyInfoLabel", ""));
+                    intent.putExtra("expandInfoLabel", cresObject.optString("expandInfoLabel", ""));
+                    intent.putExtra("acsTransID", challengeParameters.getAcsTransactionId());
+                    if (isOtpCase) {
+                        intent.putExtra("challengeInfoLabel", cresObject.optString("challengeInfoLabel", ""));
+                        intent.putExtra("challengeInfoTextIndicator", cresObject.optString("challengeInfoTextIndicator", "N"));
+                        intent.putExtra("submitAuthenticationLabel", cresObject.optString("submitAuthenticationLabel", "Submit"));
+                    } else if (isOobCase) {
+                        intent.putExtra("oobAppLabel", cresObject.optString("oobAppLabel", "OPEN YOUR BANK APP"));
+                        intent.putExtra("oobAppUrl", "oobApp://localhost/path");
+                        intent.putExtra("threeDSServerTransID", challengeParameters.getThreeDSServerTransactionId().isEmpty()
+                                ? "N/A" : challengeParameters.getThreeDSServerTransactionId());
+                    } else if (isSingleSelectCase) {
+                        intent.putExtra("challengeInfoLabel", cresObject.optString("challengeInfoLabel", ""));
+                        intent.putExtra("submitAuthenticationLabel", cresObject.optString("submitAuthenticationLabel", "Submit"));
+                        if (cresObject.has("challengeSelectInfo") && !cresObject.isNull("challengeSelectInfo")) {
+                            JSONObject challengeSelectInfo = cresObject.getJSONObject("challengeSelectInfo");
+                            intent.putExtra("radioMobile", challengeSelectInfo.has("mobile") && !challengeSelectInfo.isNull("mobile")
+                                    ? challengeSelectInfo.getString("mobile")
+                                    : null);
+                            intent.putExtra("radioEmail", challengeSelectInfo.has("email") && !challengeSelectInfo.isNull("email")
+                                    ? challengeSelectInfo.getString("email")
+                                    : null);
+                        }
+
+                    }
+                    // Handle issuer and psImage for both cases
+                    String defaultIssuerImage = "https://i.ibb.co/3k6GPqc/logibiz-logo-300x-1.png";
+                    String defaultPsImage = "https://i.ibb.co/Fw9Gtrd/Picture1.png";
+                    JSONObject issuerImageObject = cresObject.optJSONObject("issuerImage");
+                    JSONObject psImageObject = cresObject.optJSONObject("psImage");
+
+                    intent.putExtra("issuerImage", issuerImageObject != null && issuerImageObject.has("medium")
+                            ? issuerImageObject.optString("medium", defaultIssuerImage) : defaultIssuerImage);
+
+                    intent.putExtra("psImage", psImageObject != null && psImageObject.has("medium")
+                            ? psImageObject.optString("medium", defaultPsImage) : defaultPsImage);
+                    intent.putExtra("creq", creqJson.toString());
+                    intent.putExtra("acsUrl", acsURL);
+                    currentActivity.startActivity(intent);
                 }
-                currentActivity.startActivity(intent);
-            } else if (cresObject.has("acsUiType") &&
-                    cresObject.getString("acsUiType").equalsIgnoreCase("04")) {
-                FileLogger.log("INFO", TAG, "UI TYPE = '04', OOB Case");
-
-
-                Intent intent = new Intent(currentActivity, OOBConfirmationScreen.class);
-                intent.putExtra("challengeInfoHeader", cresObject.has("challengeInfoHeader")
-                        ? cresObject.getString("challengeInfoHeader") : "");
-
-                intent.putExtra("challengeInfoText", cresObject.has("challengeInfoText")
-                        ? cresObject.getString("challengeInfoText") : "");
-
-                intent.putExtra("oobAppLabel", cresObject.has("oobAppLabel")
-                        ? cresObject.getString("oobAppLabel") : "OPEN YOUR BANK APP");
-
-                intent.putExtra("oobAppUrl", "oobApp://localhost/path");
-
-                intent.putExtra("whyInfoLabel", cresObject.has("whyInfoLabel")
-                        ? cresObject.getString("whyInfoLabel") : "");
-
-                intent.putExtra("expandInfoLabel", cresObject.has("expandInfoLabel")
-                        ? cresObject.getString("expandInfoLabel") : "");
-
-                intent.putExtra("threeDSServerTransID", !challengeParameters.getThreeDSServerTransactionId().isEmpty()
-                        ? challengeParameters.getThreeDSServerTransactionId() : "N/A");
-
-                if (cresObject.has("issuerImage")) {
-                    JSONObject issuerImageObject = cresObject.getJSONObject("issuerImage");
-                    System.out.println("Issuer Image: " + issuerImageObject.getString("medium"));
-                    intent.putExtra("issuerImage", issuerImageObject.has("medium") && !issuerImageObject.getString("medium").isEmpty()
-                            ? issuerImageObject.getString("medium") : "https://i.ibb.co/3k6GPqc/logibiz-logo-300x-1.png");
-                } else {
-                    intent.putExtra("issuerImage", "https://i.ibb.co/3k6GPqc/logibiz-logo-300x-1.png");
-                }
-
-                if (cresObject.has("psImage")) {
-                    JSONObject psImageObject = cresObject.getJSONObject("psImage");
-                    System.out.println("PS Image: " + psImageObject.getString("medium"));
-                    intent.putExtra("psImage", psImageObject.has("medium") && !psImageObject.getString("medium").isEmpty()
-                            ? psImageObject.getString("medium") : "https://i.ibb.co/Fw9Gtrd/Picture1.png");
-                } else {
-                    intent.putExtra("psImage", "https://i.ibb.co/Fw9Gtrd/Picture1.png");
-                }
+            } else {
+                FileLogger.log("ERROR", TAG, "Error Case, Redirecting to Transaction Result Screen with Error");
+                Intent intent = new Intent(currentActivity, TransactionResult.class);
+                intent.putExtra("transStatus", cresObject.optString("transStatus", ""));
+                intent.putExtra("sdkTransID", cresObject.optString("sdkTransID", ""));
                 currentActivity.startActivity(intent);
             }
         } else {
             FileLogger.log("ERROR", TAG, "Error Case, Redirecting to Transaction Result Screen with Error");
             Intent intent = new Intent(currentActivity, TransactionResult.class);
             intent.putExtra("transStatus", "Error while connecting ACS");
+            intent.putExtra("sdkTransID", "");
             currentActivity.startActivity(intent);
         }
     }
@@ -304,6 +315,7 @@ public class TransactionService implements Transaction {
                 FileLogger.log("ERROR", TAG, "Error Case, Redirecting to Transaction Result Screen with Error");
                 Intent intent = new Intent(currentActivity, TransactionResult.class);
                 intent.putExtra("transStatus", "Error while connecting ACS");
+                intent.putExtra("sdkTransID", "");
                 currentActivity.startActivity(intent);
             }
         } catch (JSONException e) {
