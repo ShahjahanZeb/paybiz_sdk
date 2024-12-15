@@ -6,6 +6,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -33,11 +35,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class TransactionResult extends AppCompatActivity {
 
     private TextView resultText, paymentIdText, sdkTransIdText, ccNameText, currencyText, amountText,
-            messageId, rrn, status, messageIdHeader, rrnHeader, statusHeader;
+            messageId, rrn, status, messageIdHeader, rrnHeader, statusHeader, errorDescHeader, errorDesc;
     private Button button;
 
     private DatabaseService databaseService;
@@ -45,6 +49,9 @@ public class TransactionResult extends AppCompatActivity {
     private final String TAG = "Transaction Result Screen";
 
     private final String madaURL = "https://staging.logibiztech.com:8777/mada/mada/transaction";
+
+    private static final int TIMEOUT_DURATION = 30; // 30 seconds timeout
+
 
     @SuppressLint("Range")
     @Override
@@ -66,6 +73,9 @@ public class TransactionResult extends AppCompatActivity {
         messageIdHeader = findViewById(R.id.messageIdHeader);
         rrnHeader = findViewById(R.id.rrnHeader);
         statusHeader = findViewById(R.id.statusHeader);
+        errorDescHeader = findViewById(R.id.errorDescHeader);
+        errorDesc = findViewById(R.id.errorDesc);
+
         try {
             FileLogger.log("VERBOSE", TAG, "Getting Values from Intent, Database Saved Record and setting text dynamically on Screen");
             Intent intent = getIntent();
@@ -94,11 +104,11 @@ public class TransactionResult extends AppCompatActivity {
             paymentIdText.setText(pId);
             sdkTransIdText.setText(sdkTransId);
             ccNameText.setText(cardHolderName);
-            currencyText.setText("SAR");
+            currencyText.setText("USD");
             amountText.setText(amount);
             databaseService.deleteLastTransaction();
 //            MadaRequest madaReq = new MadaRequest();
-            if ("Payment Success".equals(tranxResult)) {
+            if ("Success".equals(tranxResult)) {
                 FileLogger.log("VERBOSE", TAG, "Transaction Successful, Calling to MADA");
 //                madaReq.setTransactionType(MadaConstant.TRANSACTION_TYPE);
 //                madaReq.setClientId(merchantId);
@@ -225,8 +235,7 @@ public class TransactionResult extends AppCompatActivity {
 //                        e.printStackTrace();
 //                    }
 //                }).start();
-
-
+                /* Correct Code
                 PostRequestTask postRequestCallable = new PostRequestTask(this.madaURL, null, new String(madaReq.toString()));
                 FutureTask<String> futureTask = new FutureTask<>(postRequestCallable);
                 ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -239,7 +248,36 @@ public class TransactionResult extends AppCompatActivity {
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
+                 */
 
+                PostRequestTask postRequestCallable = new PostRequestTask(this.madaURL, null, new String(madaReq.toString()));
+                FutureTask<String> futureTask = new FutureTask<>(postRequestCallable);
+                ExecutorService executor = Executors.newSingleThreadExecutor();
+                executor.execute(futureTask);
+
+                // Set a timeout for the network request
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (!futureTask.isDone()) {
+                        futureTask.cancel(true);  // Cancel the task if it hasn't completed in time
+                        FileLogger.log("ERROR", TAG, "Request timed out.");
+                        // Update the UI to show timeout message
+                        runOnUiThread(() -> status.setText("Request timed out. Please try again."));
+                    }
+                }, TimeUnit.SECONDS.toMillis(TIMEOUT_DURATION));
+
+                try {
+                    // Wait for response, or timeout
+                    String response = futureTask.get(TIMEOUT_DURATION, TimeUnit.SECONDS);
+                    FileLogger.log("VERBOSE", TAG, "Response Received From MADA AUTH: " + response);
+                    setData(response);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                    // Handle error gracefully
+                    runOnUiThread(() -> status.setText("An error occurred while processing the request."));
+                } catch (TimeoutException e) {
+                    e.printStackTrace();
+                    runOnUiThread(() -> status.setText("Request timed out. Please try again."));
+                }
             } else {
                 messageIdHeader.setVisibility(View.GONE);
                 rrnHeader.setVisibility(View.GONE);
@@ -248,40 +286,70 @@ public class TransactionResult extends AppCompatActivity {
                 rrn.setVisibility(View.GONE);
                 status.setVisibility(View.GONE);
             }
-        } catch (Exception e) {
-            FileLogger.log("ERROR", TAG, "Error while fetching Data: " + e.getMessage());
-        }
-        button.setOnClickListener(v -> finish());
 
-    }
+            button.setOnClickListener(v -> finish());
 
-
-    public void setData(String response) {
-        FileLogger.log("VERBOSE", TAG, "Setting Mada Response on Screen");
-        try {
-            JSONObject madaResponse = new JSONObject(response);
-            String madaStatus = madaResponse.optString("responseCodeType", "");
-            if (!madaStatus.isEmpty()) {
-                if (madaStatus.equalsIgnoreCase("APPROVED")) {
-                    messageId.setText(madaResponse.optString("messageId", ""));
-                    rrn.setText(madaResponse.optString("retrievalRef", ""));
-                } else {
-                    messageIdHeader.setVisibility(View.GONE);
-                    rrnHeader.setVisibility(View.GONE);
-                    messageId.setVisibility(View.GONE);
-                    rrn.setVisibility(View.GONE);
-                }
-            } else {
-                messageIdHeader.setVisibility(View.GONE);
-                rrnHeader.setVisibility(View.GONE);
-                messageId.setVisibility(View.GONE);
-                rrn.setVisibility(View.GONE);
-            }
-            status.setText(madaResponse.optString("responseCodeType", "Error Connection MADA Auth"));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+        public void setData(String response) {
+        FileLogger.log("VERBOSE", TAG, "Setting Mada Response on Screen");
 
+        try {
+            // Check if the response contains HTML, indicating an error page
+            if (response.toLowerCase().contains("<!doctype html>") || response.toLowerCase().contains("<html>")) {
+                FileLogger.log("ERROR", TAG, "Invalid response received: HTML error page detected.");
+                statusHeader.setVisibility(View.VISIBLE);
+                status.setVisibility(View.VISIBLE);
+                status.setText("Error: Unable to connect to MADA service. Please try again.");
+            } else {
+                // Parse the response JSON
+                FileLogger.log("ERROR", TAG, "Parsing MADA Response.");
+                JSONObject madaResponse = new JSONObject(response);
+                // Get response code type
+                String madaStatus = madaResponse.optString("responseCodeType", "");
+
+                if (!madaStatus.isEmpty()) {
+                    if (madaStatus.equalsIgnoreCase("APPROVED")) {
+                        // Show fields for approved status
+                        messageId.setVisibility(View.VISIBLE);
+                        messageIdHeader.setVisibility(View.VISIBLE);
+                        rrnHeader.setVisibility(View.VISIBLE);
+                        rrn.setVisibility(View.VISIBLE);
+                        messageId.setText(madaResponse.optString("messageId", "N/A"));
+                        rrn.setText(madaResponse.optString("retrievalRef", "N/A"));
+                    } else {
+                        // Show fields for error
+                        errorDescHeader.setVisibility(View.VISIBLE);
+                        errorDesc.setVisibility(View.VISIBLE);
+
+                        // Extract error description
+                        JSONObject errorObject = madaResponse.optJSONObject("error");
+                        String description = errorObject != null
+                                ? errorObject.optString("description", "Please correct your request.")
+                                : "Please correct your request.";
+                        errorDesc.setText(description);
+                    }
+                }
+                statusHeader.setVisibility(View.VISIBLE);
+                status.setVisibility(View.VISIBLE);
+                status.setText(madaStatus.isEmpty() ? "Error Connection MADA Auth" : madaStatus);
+            }
+
+        } catch (JSONException e) {
+            FileLogger.log("ERROR", TAG, "JSON Parsing Error: " + e.getMessage());
+            status.setText("Error: Invalid response format received. Please try again.");
+        }
+    }
+
+    // Utility method to show multiple views
+    private void showView(View... views) {
+        for (View view : views) {
+            if (view != null) {
+                view.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
 }

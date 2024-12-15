@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -44,6 +45,8 @@ public class OTPScreen extends AppCompatActivity {
 
     private String acsUrl = "";
     JSONObject creqJson = null;
+
+    int resendCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +125,10 @@ public class OTPScreen extends AppCompatActivity {
 
         String finalAcsTransId = acsTransId;
         resendButton.setOnClickListener(v -> {
+            resendCount++;
+            if (resendCount >= 5) {
+                resendButton.setVisibility(View.INVISIBLE);
+            }
             System.out.println("Resend Button Clicked: " + acsUrl + SDKConstants.RESEND_OTP_URL + finalAcsTransId);
             ApiClient apiClient = new ApiClient();
             new Thread(() -> {
@@ -147,7 +154,7 @@ public class OTPScreen extends AppCompatActivity {
                 FileLogger.log("VERBOSE", TAG, "Transaction Status: " + transResult + " ,Counter Value: " + counter);
                 if (transResult.equalsIgnoreCase("Y")) {
                     FileLogger.log("INFO", TAG, "Transaction Successful, Redirecting to Transaction Result Screen with status: " + response.toString());
-                    String transactionResult = "Payment Success";
+                    String transactionResult = "Success";
                     Intent intent = new Intent(this, TransactionResult.class);
                     intent.putExtra("transStatus", transactionResult);
                     intent.putExtra("sdkTransID", SdkTransId);
@@ -167,7 +174,7 @@ public class OTPScreen extends AppCompatActivity {
                     FileLogger.log("VERBOSE", TAG, "Transaction Counter After Increment: " + this.creqJson);
                 } else {
                     FileLogger.log("ERROR", TAG, "Transaction Unsuccessful, Redirecting to Payment Result Screen with status: " + response.toString());
-                    String transactionResult = "Payment Unsuccessful";
+                    String transactionResult = "Unsuccessful";
                     Intent intent = new Intent(this, TransactionResult.class);
                     intent.putExtra("transStatus", transactionResult);
                     startActivity(intent);

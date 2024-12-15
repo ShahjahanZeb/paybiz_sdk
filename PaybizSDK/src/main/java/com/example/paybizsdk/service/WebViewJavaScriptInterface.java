@@ -135,7 +135,7 @@ public class WebViewJavaScriptInterface {
                     FileLogger.log("VERBOSE", TAG, "Transaction Status: " + transResult + " ,Counter Value: " + counter);
                     if (transResult.equalsIgnoreCase("Y")) {
                         FileLogger.log("INFO", TAG, "Transaction Successful, Redirecting to Transaction Result Screen with status: " + response.toString());
-                        String transactionResult = "Payment Success";
+                        String transactionResult = "Success";
                         Intent intent = new Intent(this.context, TransactionResult.class);
                         intent.putExtra("transStatus", transactionResult);
                         intent.putExtra("sdkTransID", SdkTransId);
@@ -143,7 +143,7 @@ public class WebViewJavaScriptInterface {
                         this.activity.finish();
                     } else {
                         FileLogger.log("ERROR", TAG, "Transaction Unsuccessful, Redirecting to Payment Result Screen with status: " + response.toString());
-                        String transactionResult = "Payment Unsuccessful";
+                        String transactionResult = "Unsuccessful";
                         Intent intent = new Intent(this.context, TransactionResult.class);
                         intent.putExtra("transStatus", transactionResult);
                         intent.putExtra("sdkTransID", SdkTransId);

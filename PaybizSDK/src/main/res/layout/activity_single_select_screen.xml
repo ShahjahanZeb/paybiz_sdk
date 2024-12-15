@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="@drawable/page_border">
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
@@ -28,7 +29,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
         tools:context=".MainActivity"
-        tools:ignore="MissingConstraints">
+        tools:ignore="MissingConstraints"
+        >
 
         <TextView
             android:id="@+id/textView12"
@@ -37,7 +39,6 @@
             android:text="SECURE CHECKOUT"
             android:textColor="#292F33"
             android:textStyle="bold"
-            android:textFontWeight="900"
             android:textSize="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -54,6 +55,7 @@
             android:text="Cancel"
             android:textSize="12dp"
             android:padding="0dp"
+            android:textStyle="bold"
             android:textColor="#000000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -135,7 +137,7 @@
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/challengeInfoText"
-        app:layout_constraintVertical_bias="0.05" />
+        app:layout_constraintVertical_bias="0.04" />
 
     <RadioGroup
         android:id="@+id/radioButtons"
@@ -148,13 +150,14 @@
         app:layout_constraintHorizontal_bias="0.422"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/challengeInfoLabel"
-        app:layout_constraintVertical_bias="0.291">
+        app:layout_constraintVertical_bias="0.08">
 
         <RadioButton
             android:id="@+id/radioMobile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
+            android:textSize="18sp"
             android:buttonTint="#064C70"
             android:textColor="@color/cardview_dark_background"/>
 
@@ -163,6 +166,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
+            android:textSize="18sp"
             android:buttonTint="#064C70"
             android:textColor="@color/cardview_dark_background"/>
     </RadioGroup>
@@ -183,7 +187,7 @@
         app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioButtons"
-        app:layout_constraintVertical_bias="0.278" />
+        app:layout_constraintVertical_bias="0.2" />
 
     <TextView
         android:id="@+id/whyInfoLabel"
@@ -198,7 +202,7 @@
         android:layout_marginLeft="30sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/submitButton"
-        app:layout_constraintVertical_bias="0.3" />
+        app:layout_constraintVertical_bias="0.2" />
 
 
     <TextView

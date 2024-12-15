@@ -190,16 +190,16 @@ public class TransactionService implements Transaction {
 
                     }
                     // Handle issuer and psImage for both cases
-                    String defaultIssuerImage = "https://i.ibb.co/3k6GPqc/logibiz-logo-300x-1.png";
-                    String defaultPsImage = "https://i.ibb.co/Fw9Gtrd/Picture1.png";
+//                    String defaultIssuerImage = "https://i.ibb.co/3k6GPqc/logibiz-logo-300x-1.png";
+//                    String defaultPsImage = "https://i.ibb.co/Fw9Gtrd/Picture1.png";
                     JSONObject issuerImageObject = cresObject.optJSONObject("issuerImage");
                     JSONObject psImageObject = cresObject.optJSONObject("psImage");
 
                     intent.putExtra("issuerImage", issuerImageObject != null && issuerImageObject.has("medium")
-                            ? issuerImageObject.optString("medium", defaultIssuerImage) : defaultIssuerImage);
+                            ? issuerImageObject.optString("medium", "") : "");
 
                     intent.putExtra("psImage", psImageObject != null && psImageObject.has("medium")
-                            ? psImageObject.optString("medium", defaultPsImage) : defaultPsImage);
+                            ? psImageObject.optString("medium", "") : "");
                     intent.putExtra("creq", creqJson.toString());
                     intent.putExtra("acsUrl", acsURL);
                     currentActivity.startActivity(intent);
@@ -296,7 +296,7 @@ public class TransactionService implements Transaction {
                 String sdkTransId = cresObject.has("sdkTransID") ? String.valueOf(cresObject.get("sdkTransID")) : "Not Present";
                 if (transResult.equalsIgnoreCase("Y")) {
                     FileLogger.log("INFO", TAG, "Transaction Successful, Redirecting to Transaction Result Screen with status: " + cresObject.toString());
-                    String transactionResult = "Payment Success";
+                    String transactionResult = "Success";
                     Intent intent = new Intent(currentActivity, TransactionResult.class);
                     intent.putExtra("transStatus", transactionResult);
                     intent.putExtra("sdkTransID", sdkTransId);

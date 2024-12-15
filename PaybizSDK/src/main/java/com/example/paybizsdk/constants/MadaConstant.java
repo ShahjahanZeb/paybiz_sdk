@@ -26,7 +26,7 @@ public class MadaConstant {
 
     public static final String COUNTRY_CODE = "586";
 
-    public static final String CURRENCY = "SAR";
+    public static final String CURRENCY = "USD";
 
     public static final String MERCHANT_REF = "123900";
 
