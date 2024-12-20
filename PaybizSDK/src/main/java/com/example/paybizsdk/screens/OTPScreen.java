@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.example.paybizsdk.Logger.FileLogger;
@@ -37,7 +39,8 @@ import java.util.concurrent.FutureTask;
 public class OTPScreen extends AppCompatActivity {
 
     private static final String TAG = "OTPScreen";
-    private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText, whyInfo, whyInfoLabelArrow, resendButton;
+    private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText,
+            whyInfo, whyInfoLabelArrow, resendButton, whiteListingInfoText;
     private EditText otpInput;
     private Button submitButton, backButton;
 
@@ -46,7 +49,10 @@ public class OTPScreen extends AppCompatActivity {
     private String acsUrl = "";
     JSONObject creqJson = null;
 
+    RadioButton radioYes, radioNo;
+    RadioGroup radioButtons;
     int resendCount = 0;
+    private String whiteListingFlag = "N";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +73,11 @@ public class OTPScreen extends AppCompatActivity {
         warningImage = findViewById(R.id.warning);
         whyInfoLabelArrow = findViewById(R.id.whyInfoLabelArrow);
         resendButton = findViewById(R.id.resendButton);
+        whiteListingInfoText = findViewById(R.id.whiteListingInfoText);
+        radioYes = findViewById(R.id.radioYes);
+        radioNo = findViewById(R.id.radioNo);
+        radioNo.setChecked(true);
+        radioButtons = findViewById(R.id.radioButtons);
         Intent intent = getIntent();
         String acsTransId = "";
         if (intent != null) {
@@ -79,6 +90,7 @@ public class OTPScreen extends AppCompatActivity {
             String psImage = intent.getStringExtra("psImage");
             String submitAuthenticationLabel = intent.getStringExtra("submitAuthenticationLabel");
             String whyInfoLabel = intent.getStringExtra("whyInfoLabel");
+            String whitelistingInfoText = intent.getStringExtra("whitelistingInfoText");
             acsUrl = intent.getStringExtra("acsUrl");
             acsTransId = intent.getStringExtra("acsTransID");
             FileLogger.log("VERBOSE", TAG, "Values stored in Variables");
@@ -93,6 +105,11 @@ public class OTPScreen extends AppCompatActivity {
             if (whyInfoLabel.isEmpty() || whyInfoLabel.equals("") || whyInfoLabel == null) {
                 whyInfoLabelArrow.setText("");
             }
+            if (whitelistingInfoText != null && !whitelistingInfoText.isEmpty()) {
+                whiteListingInfoText.setVisibility(View.VISIBLE);
+                whiteListingInfoText.setText(whitelistingInfoText);
+                radioButtons.setVisibility(View.VISIBLE);
+            }
             submitButton.setText(submitAuthenticationLabel);
             System.out.println("\n\nImages URL: " + issuerImageContent + "\n" + psImage);
             new DownloadImagesTask(issuerImage, paymentScheme).execute(issuerImageContent, psImage);
@@ -101,10 +118,12 @@ public class OTPScreen extends AppCompatActivity {
         try {
             FileLogger.log("VERBOSE", TAG, "Mapping CReq String to JSON Object");
             this.creqJson = new JSONObject(intent.getStringExtra("creq").toString());
+            creqJson.put("whitelistingDataEntry", whiteListingFlag);
             FileLogger.log("VERBOSE", TAG, "Mapping Done");
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+
 
         backButton.setOnClickListener(v -> finish());
 
@@ -139,6 +158,23 @@ public class OTPScreen extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }).start();
+        });
+        radioYes.setOnClickListener(v -> {
+            this.whiteListingFlag = "Y";
+            try {
+                creqJson.put("whitelistingDataEntry", whiteListingFlag);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        radioNo.setOnClickListener(v -> {
+            this.whiteListingFlag = "N";
+            try {
+                creqJson.put("whitelistingDataEntry", whiteListingFlag);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 

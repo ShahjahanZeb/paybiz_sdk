@@ -90,7 +90,7 @@ public class TransactionService implements Transaction {
         creqJson.put("resendChallenge", "N");
         creqJson.put("sdkTransID", challengeParameters.getSdkTransID());
         creqJson.put("sdkCounterStoA", "001");
-        creqJson.put("whitelistingDataEntry", "Y");
+//        creqJson.put("whitelistingDataEntry", "Y");
 //        creqJson.put("oobAppURLInd", "01");
         creqJson.put("threeDSRequestorAppURL", "oobApp://localhost/path");
         System.out.println("CReq Json: " + creqJson);
@@ -165,6 +165,7 @@ public class TransactionService implements Transaction {
                     intent.putExtra("challengeInfoText", cresObject.optString("challengeInfoText", ""));
                     intent.putExtra("whyInfoLabel", cresObject.optString("whyInfoLabel", ""));
                     intent.putExtra("expandInfoLabel", cresObject.optString("expandInfoLabel", ""));
+                    intent.putExtra("whitelistingInfoText", cresObject.optString("whitelistingInfoText", ""));
                     intent.putExtra("acsTransID", challengeParameters.getAcsTransactionId());
                     if (isOtpCase) {
                         intent.putExtra("challengeInfoLabel", cresObject.optString("challengeInfoLabel", ""));

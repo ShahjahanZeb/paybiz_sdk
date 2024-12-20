@@ -117,7 +117,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/challengeInfoHeader" />
+        app:layout_constraintTop_toBottomOf="@+id/challengeInfoHeader"
+        app:layout_constraintVertical_bias="0.39" />
 
     <TextView
         android:id="@+id/challengeInfoText"
@@ -131,7 +132,7 @@
         app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/challengeInfoHeader"
-        app:layout_constraintVertical_bias="0.177" />
+        app:layout_constraintVertical_bias="0.14" />
 
     <TextView
         android:id="@+id/challengeInfoLabel"
@@ -185,7 +186,7 @@
         app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/submitButton"
-        app:layout_constraintVertical_bias="0.2" />
+        app:layout_constraintVertical_bias="0.1" />
 
     <Button
         android:id="@+id/submitButton"
@@ -202,43 +203,90 @@
         app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/otpInput"
-        app:layout_constraintVertical_bias="0.191" />
+        app:layout_constraintVertical_bias="0.17" />
+
+    <TextView
+        android:id="@+id/whiteListingInfoText"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/resendButton"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/resendButton"
+        app:layout_constraintTop_toBottomOf="@+id/resendButton"
+        app:layout_constraintVertical_bias="0.22" />
+
+    <RadioGroup
+        android:id="@+id/radioButtons"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/whiteListingInfoText"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/whiteListingInfoText"
+        app:layout_constraintTop_toBottomOf="@+id/whiteListingInfoText"
+        app:layout_constraintVertical_bias="0.19">
+
+        <RadioButton
+            android:id="@+id/radioYes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="#064C70"
+            android:text="Yes"
+            android:textColor="@color/cardview_dark_background"
+            android:textSize="18sp" />
+
+        <RadioButton
+            android:id="@+id/radioNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="#064C70"
+            android:text="No"
+            android:textColor="@color/cardview_dark_background"
+            android:textSize="18sp" />
+    </RadioGroup>
 
     <TextView
         android:id="@+id/whyInfoLabel"
         android:layout_width="300sp"
         android:layout_height="wrap_content"
-        android:textColor="@color/cardview_dark_background"
-        android:textStyle="normal"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
         android:layout_marginLeft="30sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/resendButton"
-        app:layout_constraintVertical_bias="0.3" />
-
-
-
-
-
-    <TextView
-        android:id="@+id/whyInfoLabelArrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="\u2193"
         android:textColor="@color/cardview_dark_background"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.619"
-        app:layout_constraintStart_toEndOf="@+id/whyInfoLabel"
-        app:layout_constraintTop_toBottomOf="@+id/resendButton"
-        app:layout_constraintVertical_bias="0.316" />
+        app:layout_constraintHorizontal_bias="0.27"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioButtons"
+        app:layout_constraintVertical_bias="0.5"
+        android:layout_marginBottom="10sp"
+        android:layout_marginTop="30sp"
+        />
 
-
+        <TextView
+            android:id="@+id/whyInfoLabelArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="\u2193"
+            android:textColor="@color/cardview_dark_background"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.619"
+            app:layout_constraintStart_toEndOf="@+id/whyInfoLabel"
+            app:layout_constraintTop_toBottomOf="@+id/radioButtons"
+            app:layout_constraintVertical_bias="0.5"
+            android:layout_marginBottom="10sp"
+            android:layout_marginTop="30sp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
