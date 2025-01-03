@@ -14,6 +14,12 @@
 
     <application>
         <activity
+            android:name=".screens.WhiteListingOTP"
+            android:exported="false" />
+        <activity
+            android:name=".screens.NpaOTPScreen"
+            android:exported="false" />
+        <activity
             android:name=".screens.SingleSelectScreen"
             android:exported="false" />
         <activity

@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cardview_light_background"
+    tools:context=".screens.WhiteListingOTP">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerSection"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:background="#88acd4"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:context=".MainActivity"
+        tools:ignore="MissingConstraints">
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SECURE CHECKOUT"
+            android:textColor="#292F33"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.9" />
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#88acd4"
+            android:padding="0dp"
+            android:text="Cancel"
+            android:textColor="#000000"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.9"
+            app:layout_constraintStart_toEndOf="@+id/textView12"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.064" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="80sp"
+        android:layout_height="80sp"
+        android:minWidth="80sp"
+        android:minHeight="80sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.877"
+        app:layout_constraintStart_toEndOf="@+id/paymentLogo"
+        app:layout_constraintTop_toTopOf="@+id/headerSection"
+        app:layout_constraintVertical_bias="0.101" />
+
+    <ImageView
+        android:id="@+id/paymentLogo"
+        android:layout_width="80sp"
+        android:layout_height="80sp"
+        android:minWidth="80sp"
+        android:minHeight="80sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.09"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/headerSection"
+        app:layout_constraintVertical_bias="0.102" />
+
+    <TextView
+        android:id="@+id/challengeInfoHeader"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text=""
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.557"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/paymentLogo"
+        app:layout_constraintVertical_bias="0.034" />
+
+    <ImageView
+        android:id="@+id/warning"
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:maxWidth="80sp"
+        android:maxHeight="80sp"
+        app:layout_constraintBottom_toTopOf="@+id/challengeInfoText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/challengeInfoHeader"
+        app:layout_constraintVertical_bias="0.39" />
+
+    <TextView
+        android:id="@+id/challengeInfoText"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/challengeInfoHeader"
+        app:layout_constraintVertical_bias="0.14" />
+
+    <TextView
+        android:id="@+id/challengeInfoLabel"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/challengeInfoText"
+        app:layout_constraintVertical_bias="0.046" />
+
+    <EditText
+        android:id="@+id/otpInput"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10sp"
+        android:background="@drawable/edit_text_design"
+        android:hint="Enter OTP"
+        android:inputType="numberPassword"
+        android:maxLength="6"
+        android:minWidth="300sp"
+        android:minHeight="40sp"
+        android:paddingLeft="10sp"
+        android:textColor="@color/cardview_dark_background"
+        app:hintTextColor="@color/cardview_dark_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/challengeInfoLabel"
+        app:layout_constraintVertical_bias="0.01" />
+
+    <Button
+        android:id="@+id/resendButton"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:width="300sp"
+        android:height="45sp"
+        android:background="@drawable/resend_button_background"
+        android:text="RESEND CODE"
+        android:textColor="@color/cardview_light_background"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/submitButton"
+        app:layout_constraintVertical_bias="0.08" />
+
+    <Button
+        android:id="@+id/submitButton"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:width="300sp"
+        android:height="45sp"
+        android:background="@drawable/button_background"
+        android:textColor="@color/cardview_light_background"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/otpInput"
+        app:layout_constraintVertical_bias="0.08" />
+
+    <TextView
+        android:id="@+id/whiteListingInfoText"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/resendButton"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/resendButton"
+        app:layout_constraintTop_toBottomOf="@+id/resendButton"
+        app:layout_constraintVertical_bias="0.12" />
+
+    <RadioGroup
+        android:id="@+id/radioButtons"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/whiteListingInfoText"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/whiteListingInfoText"
+        app:layout_constraintTop_toBottomOf="@+id/whiteListingInfoText"
+        app:layout_constraintVertical_bias="0.13">
+
+        <RadioButton
+            android:id="@+id/radioYes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="#064C70"
+            android:text="Yes"
+            android:textColor="@color/cardview_dark_background"
+            android:textSize="18sp" />
+
+        <RadioButton
+            android:id="@+id/radioNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="#064C70"
+            android:text="No"
+            android:textColor="@color/cardview_dark_background"
+            android:textSize="18sp" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/whyInfoLabel"
+        android:layout_width="280sp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30sp"
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.27"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioButtons"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <TextView
+        android:id="@+id/whyInfoLabelArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="\u2193"
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.234"
+        app:layout_constraintStart_toEndOf="@+id/whyInfoLabel"
+        app:layout_constraintTop_toBottomOf="@+id/radioButtons"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <TextView
+        android:id="@+id/expandInfoLabel"
+        android:layout_width="280sp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30sp"
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.27"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/whyInfoLabel"
+        app:layout_constraintVertical_bias="0.4"
+        android:layout_marginBottom="10sp"
+        />
+
+    <TextView
+        android:id="@+id/expandInfoLabelArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="\u2193"
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.219"
+        app:layout_constraintStart_toEndOf="@+id/expandInfoLabel"
+        app:layout_constraintTop_toBottomOf="@+id/whyInfoLabel"
+        app:layout_constraintVertical_bias="0.4"
+        android:layout_marginBottom="10sp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

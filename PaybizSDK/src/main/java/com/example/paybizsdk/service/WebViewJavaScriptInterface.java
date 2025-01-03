@@ -5,7 +5,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -13,9 +12,9 @@ import android.widget.Toast;
 import com.example.paybizsdk.Logger.FileLogger;
 import com.example.paybizsdk.constants.SDKConstants;
 import com.example.paybizsdk.screens.HTMLRender;
-import com.example.paybizsdk.screens.TransactionResult;
 import com.example.paybizsdk.utility.ApiClient;
 import com.example.paybizsdk.utility.PostRequestTask;
+import com.example.paybizsdk.utility.SDKCall;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -118,6 +117,8 @@ public class WebViewJavaScriptInterface {
                 String acsHTML = cres.optString("acsHTML", null);
                 String transResult = cres.has("transStatus") ? String.valueOf(cres.get("transStatus")) : "Not Present";
                 String SdkTransId = cres.has("sdkTransID") ? String.valueOf(cres.get("sdkTransID")) : "Not Present";
+                String threeDSServerTransID = cres.has("threeDSServerTransID") ? String.valueOf(cres.get("threeDSServerTransID")) : "";
+                String acsTransID = cres.has("acsTransID") ? String.valueOf(cres.get("acsTransID")) : "";
                 if (acsHTML != null) {
                     FileLogger.log("INFO", TAG, "HTML Render");
                     byte[] decodedBytes = Base64.getUrlDecoder().decode(acsHTML);
@@ -135,29 +136,18 @@ public class WebViewJavaScriptInterface {
                     FileLogger.log("VERBOSE", TAG, "Transaction Status: " + transResult + " ,Counter Value: " + counter);
                     if (transResult.equalsIgnoreCase("Y")) {
                         FileLogger.log("INFO", TAG, "Transaction Successful, Redirecting to Transaction Result Screen with status: " + response.toString());
-                        String transactionResult = "Success";
-                        Intent intent = new Intent(this.context, TransactionResult.class);
-                        intent.putExtra("transStatus", transactionResult);
-                        intent.putExtra("sdkTransID", SdkTransId);
-                        this.context.startActivity(intent);
+                        SDKCall.triggerEvent(this.context, threeDSServerTransID, acsTransID, SdkTransId, transResult);
                         this.activity.finish();
                     } else {
                         FileLogger.log("ERROR", TAG, "Transaction Unsuccessful, Redirecting to Payment Result Screen with status: " + response.toString());
-                        String transactionResult = "Unsuccessful";
-                        Intent intent = new Intent(this.context, TransactionResult.class);
-                        intent.putExtra("transStatus", transactionResult);
-                        intent.putExtra("sdkTransID", SdkTransId);
-                        this.context.startActivity(intent);
+                        SDKCall.triggerEvent(this.context, threeDSServerTransID, acsTransID, SdkTransId, transResult);
                         this.activity.finish();
                     }
                 }
             } else {
                 FileLogger.log("ERROR", TAG, "No Response from ACS");
                 String transactionResult = "Error Connecting to ACS";
-                Intent intent = new Intent(this.context, TransactionResult.class);
-                intent.putExtra("transStatus", transactionResult);
-                intent.putExtra("sdkTransID", "");
-                this.context.startActivity(intent);
+                SDKCall.triggerEvent(this.context, "", "", "", transactionResult);
                 this.activity.finish();
             }
         } catch (JSONException ex) {

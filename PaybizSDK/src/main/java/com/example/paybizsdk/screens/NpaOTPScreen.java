@@ -4,10 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -20,51 +17,44 @@ import android.widget.TextView;
 import com.example.paybizsdk.Logger.FileLogger;
 import com.example.paybizsdk.R;
 import com.example.paybizsdk.constants.SDKConstants;
-import com.example.paybizsdk.controller.PaybizController;
-import com.example.paybizsdk.entity.ProgressDialog;
-import com.example.paybizsdk.interfaces.Transaction;
 import com.example.paybizsdk.service.TransactionService;
-import com.example.paybizsdk.utility.SDKCall;
 import com.example.paybizsdk.utility.ApiClient;
 import com.example.paybizsdk.utility.PostRequestTask;
+import com.example.paybizsdk.utility.SDKCall;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Base64;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
-public class OTPScreen extends AppCompatActivity {
+public class NpaOTPScreen extends AppCompatActivity {
 
-        private static final String TAG = "OTPScreen";
-        private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText,
-                whyInfo, whyInfoLabelArrow, resendButton, expandInfoLabel, expandInfoLabelArrow;
-        private EditText otpInput;
-        private Button submitButton, backButton;
+    private static final String TAG = "NPAOTPScreen";
+    private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText,
+            whyInfo, whyInfoLabelArrow, resendButton, expandInfoLabel, expandInfoLabelArrow;
+    private EditText otpInput;
+    private Button submitButton, backButton;
 
-        private ImageView issuerImage, paymentScheme, warningImage;
+    private ImageView warningImage;
 
-        private String acsUrl = "";
-        JSONObject creqJson = null;
-        int resendCount = 0;
-    ProgressDialog progressDialog;
+    private String acsUrl = "";
+    JSONObject creqJson = null;
 
-    private Transaction transaction;
+    RadioButton radioYes, radioNo;
+    RadioGroup radioButtons;
+    int resendCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_otpscreen);
-        FileLogger.log("INFO", TAG, "OTP Screen Opened");
-        TransactionService transactionService = new TransactionService();
-        progressDialog = transactionService.getProgressView(this);
+        setContentView(R.layout.activity_npa_otpscreen);
+
+        FileLogger.log("INFO", TAG, "NPA OTP Screen Opened");
         challengeInfoHeader = findViewById(R.id.challengeInfoHeader);
         challengeInfoLabel = findViewById(R.id.challengeInfoLabel);
         challengeInfoText = findViewById(R.id.challengeInfoText);
@@ -72,15 +62,12 @@ public class OTPScreen extends AppCompatActivity {
         submitButton = findViewById(R.id.submitButton);
         backButton = findViewById(R.id.backButton);
         challengeInfoText.setTextColor(Color.BLACK);
-//        challengeInfoText.setTextSize(12f);
-        issuerImage = findViewById(R.id.paymentLogo);
-        paymentScheme = findViewById(R.id.imageView);
         whyInfo = findViewById(R.id.whyInfoLabel);
         warningImage = findViewById(R.id.warning);
         whyInfoLabelArrow = findViewById(R.id.whyInfoLabelArrow);
+        resendButton = findViewById(R.id.resendButton);
         expandInfoLabel = findViewById(R.id.expandInfoLabel);
         expandInfoLabelArrow = findViewById(R.id.expandInfoLabelArrow);
-        resendButton = findViewById(R.id.resendButton);
         Intent intent = getIntent();
         String acsTransId = "";
         if (intent != null) {
@@ -93,7 +80,6 @@ public class OTPScreen extends AppCompatActivity {
             String psImage = intent.getStringExtra("psImage");
             String submitAuthenticationLabel = intent.getStringExtra("submitAuthenticationLabel");
             String whyInfoLabel = intent.getStringExtra("whyInfoLabel");
-            String expandInfo = intent.getStringExtra("expandInfoLabel");
             acsUrl = intent.getStringExtra("acsUrl");
             acsTransId = intent.getStringExtra("acsTransID");
             FileLogger.log("VERBOSE", TAG, "Values stored in Variables");
@@ -104,19 +90,15 @@ public class OTPScreen extends AppCompatActivity {
                 challengeInfoText.setText(updatedText);
                 challengeInfoText.setLineSpacing(5, 1f);
             }
-            if(expandInfo != null){
-                expandInfoLabel.setVisibility(View.VISIBLE);
-                expandInfoLabelArrow.setVisibility(View.VISIBLE);
-                expandInfoLabel.setText(expandInfo);
-            }
             whyInfo.setText(whyInfoLabel);
             if (whyInfoLabel.isEmpty() || whyInfoLabel.equals("") || whyInfoLabel == null) {
                 whyInfoLabelArrow.setText("");
             }
             submitButton.setText(submitAuthenticationLabel);
             System.out.println("\n\nImages URL: " + issuerImageContent + "\n" + psImage);
-            new DownloadImagesTask(issuerImage, paymentScheme).execute(issuerImageContent, psImage);
             FileLogger.log("VERBOSE", TAG, "Fetched Intent Values, Set Text Dynamically on Screen");
+            expandInfoLabel.setVisibility(View.INVISIBLE);
+            expandInfoLabelArrow.setVisibility(View.INVISIBLE);
         }
         try {
             FileLogger.log("VERBOSE", TAG, "Mapping CReq String to JSON Object");
@@ -130,7 +112,6 @@ public class OTPScreen extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         submitButton.setOnClickListener(v -> {
-            progressDialog.show();
             String otp = otpInput.getText().toString().trim();
             if (otp.isEmpty()) {
                 otpInput.setError("Please enter the OTP");
@@ -162,6 +143,7 @@ public class OTPScreen extends AppCompatActivity {
                 }
             }).start();
         });
+
     }
 
     public void sendCreqRequest() {
@@ -176,7 +158,6 @@ public class OTPScreen extends AppCompatActivity {
                 String acsTransID = cres.has("acsTransID") ? String.valueOf(cres.get("acsTransID")) : "";
                 String counter = cres.has("acsCounterAtoS") ? cres.optString("acsCounterAtoS") : "001";
                 FileLogger.log("VERBOSE", TAG, "Transaction Status: " + transResult + " ,Counter Value: " + counter);
-                progressDialog.hide();
                 if (transResult.equalsIgnoreCase("Y") && cres.has("transStatus")) {
                     FileLogger.log("INFO", TAG, "Transaction Successful, Redirecting to Transaction Result Screen with status: " + response.toString());
                     SDKCall.triggerEvent(this, threeDSServerTransID, acsTransID, SdkTransId, transResult);
@@ -185,7 +166,7 @@ public class OTPScreen extends AppCompatActivity {
                     FileLogger.log("INFO", TAG, "Transaction Not Successful, Redirecting to Transaction Result Screen with status: " + response.toString());
                     SDKCall.triggerEvent(this, threeDSServerTransID, acsTransID, SdkTransId, transResult);
                     finish();
-                } else if(cres.has("challengeInfoText")) {
+                } else if (cres.has("challengeInfoText")) {
                     FileLogger.log("INFO", TAG, "Invalid OTP Entered by User");
                     challengeInfoText.setText(cres.optString("challengeInfoText", ""));
                     warningImage.setImageDrawable(ContextCompat.getDrawable(this, R.mipmap.ic_warning_round_foreground));
@@ -219,62 +200,5 @@ public class OTPScreen extends AppCompatActivity {
             e.printStackTrace();
         }
         return response;
-    }
-
-    private static class DownloadImagesTask extends AsyncTask<String, Void, Bitmap[]> {
-
-        private ImageView imageView1, imageView2;
-
-        public DownloadImagesTask(ImageView imageView1, ImageView imageView2) {
-            this.imageView1 = imageView1;
-            this.imageView2 = imageView2;
-        }
-
-        @Override
-        protected Bitmap[] doInBackground(String... urls) {
-            Bitmap[] bitmaps = new Bitmap[2];
-            try {
-                // Validate URLs and prepend http:// if necessary
-                String imageUrl1 = validateUrl(urls[0]);
-                String imageUrl2 = validateUrl(urls[1]);
-
-                // Download the first image
-                URL url1 = new URL(imageUrl1);
-                HttpURLConnection connection1 = (HttpURLConnection) url1.openConnection();
-                connection1.setDoInput(true);
-                connection1.connect();
-                InputStream input1 = connection1.getInputStream();
-                bitmaps[0] = BitmapFactory.decodeStream(input1);
-
-                // Download the second image
-                URL url2 = new URL(imageUrl2);
-                HttpURLConnection connection2 = (HttpURLConnection) url2.openConnection();
-                connection2.setDoInput(true);
-                connection2.connect();
-                InputStream input2 = connection2.getInputStream();
-                bitmaps[1] = BitmapFactory.decodeStream(input2);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return bitmaps;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap[] result) {
-            if (result[0] != null) {
-                imageView1.setImageBitmap(result[0]);
-            }
-            if (result[1] != null) {
-                imageView2.setImageBitmap(result[1]);
-            }
-        }
-
-        // Validate the URL and add the protocol if it's missing
-        private String validateUrl(String url) {
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = "https://" + url; // Default to https if protocol is missing
-            }
-            return url;
-        }
     }
 }

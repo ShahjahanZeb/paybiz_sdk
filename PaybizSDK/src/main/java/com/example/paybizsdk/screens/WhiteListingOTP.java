@@ -20,13 +20,10 @@ import android.widget.TextView;
 import com.example.paybizsdk.Logger.FileLogger;
 import com.example.paybizsdk.R;
 import com.example.paybizsdk.constants.SDKConstants;
-import com.example.paybizsdk.controller.PaybizController;
-import com.example.paybizsdk.entity.ProgressDialog;
-import com.example.paybizsdk.interfaces.Transaction;
 import com.example.paybizsdk.service.TransactionService;
-import com.example.paybizsdk.utility.SDKCall;
 import com.example.paybizsdk.utility.ApiClient;
 import com.example.paybizsdk.utility.PostRequestTask;
+import com.example.paybizsdk.utility.SDKCall;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,30 +38,29 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
-public class OTPScreen extends AppCompatActivity {
+public class WhiteListingOTP extends AppCompatActivity {
 
-        private static final String TAG = "OTPScreen";
-        private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText,
-                whyInfo, whyInfoLabelArrow, resendButton, expandInfoLabel, expandInfoLabelArrow;
-        private EditText otpInput;
-        private Button submitButton, backButton;
+    private static final String TAG = "OTPScreen";
+    private TextView challengeInfoHeader, challengeInfoLabel, challengeInfoText,
+            whyInfo, whyInfoLabelArrow, resendButton, whiteListingInfoText;
+    private EditText otpInput;
+    private Button submitButton, backButton;
 
-        private ImageView issuerImage, paymentScheme, warningImage;
+    private ImageView issuerImage, paymentScheme, warningImage;
 
-        private String acsUrl = "";
-        JSONObject creqJson = null;
-        int resendCount = 0;
-    ProgressDialog progressDialog;
+    private String acsUrl = "";
+    JSONObject creqJson = null;
 
-    private Transaction transaction;
+    RadioButton radioYes, radioNo;
+    RadioGroup radioButtons;
+    int resendCount = 0;
+    private String whiteListingFlag = "N";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_otpscreen);
+        setContentView(R.layout.activity_white_listing_otp);
         FileLogger.log("INFO", TAG, "OTP Screen Opened");
-        TransactionService transactionService = new TransactionService();
-        progressDialog = transactionService.getProgressView(this);
         challengeInfoHeader = findViewById(R.id.challengeInfoHeader);
         challengeInfoLabel = findViewById(R.id.challengeInfoLabel);
         challengeInfoText = findViewById(R.id.challengeInfoText);
@@ -78,9 +74,12 @@ public class OTPScreen extends AppCompatActivity {
         whyInfo = findViewById(R.id.whyInfoLabel);
         warningImage = findViewById(R.id.warning);
         whyInfoLabelArrow = findViewById(R.id.whyInfoLabelArrow);
-        expandInfoLabel = findViewById(R.id.expandInfoLabel);
-        expandInfoLabelArrow = findViewById(R.id.expandInfoLabelArrow);
         resendButton = findViewById(R.id.resendButton);
+        whiteListingInfoText = findViewById(R.id.whiteListingInfoText);
+        radioYes = findViewById(R.id.radioYes);
+        radioNo = findViewById(R.id.radioNo);
+        radioNo.setChecked(true);
+        radioButtons = findViewById(R.id.radioButtons);
         Intent intent = getIntent();
         String acsTransId = "";
         if (intent != null) {
@@ -93,7 +92,7 @@ public class OTPScreen extends AppCompatActivity {
             String psImage = intent.getStringExtra("psImage");
             String submitAuthenticationLabel = intent.getStringExtra("submitAuthenticationLabel");
             String whyInfoLabel = intent.getStringExtra("whyInfoLabel");
-            String expandInfo = intent.getStringExtra("expandInfoLabel");
+            String whitelistingInfoText = intent.getStringExtra("whitelistingInfoText");
             acsUrl = intent.getStringExtra("acsUrl");
             acsTransId = intent.getStringExtra("acsTransID");
             FileLogger.log("VERBOSE", TAG, "Values stored in Variables");
@@ -104,23 +103,24 @@ public class OTPScreen extends AppCompatActivity {
                 challengeInfoText.setText(updatedText);
                 challengeInfoText.setLineSpacing(5, 1f);
             }
-            if(expandInfo != null){
-                expandInfoLabel.setVisibility(View.VISIBLE);
-                expandInfoLabelArrow.setVisibility(View.VISIBLE);
-                expandInfoLabel.setText(expandInfo);
-            }
             whyInfo.setText(whyInfoLabel);
             if (whyInfoLabel.isEmpty() || whyInfoLabel.equals("") || whyInfoLabel == null) {
                 whyInfoLabelArrow.setText("");
             }
+            if (whitelistingInfoText != null && !whitelistingInfoText.isEmpty()) {
+                whiteListingInfoText.setVisibility(View.VISIBLE);
+                whiteListingInfoText.setText(whitelistingInfoText);
+                radioButtons.setVisibility(View.VISIBLE);
+            }
             submitButton.setText(submitAuthenticationLabel);
             System.out.println("\n\nImages URL: " + issuerImageContent + "\n" + psImage);
-            new DownloadImagesTask(issuerImage, paymentScheme).execute(issuerImageContent, psImage);
+            new WhiteListingOTP.DownloadImagesTask(issuerImage, paymentScheme).execute(issuerImageContent, psImage);
             FileLogger.log("VERBOSE", TAG, "Fetched Intent Values, Set Text Dynamically on Screen");
         }
         try {
             FileLogger.log("VERBOSE", TAG, "Mapping CReq String to JSON Object");
             this.creqJson = new JSONObject(intent.getStringExtra("creq").toString());
+            creqJson.put("whitelistingDataEntry", whiteListingFlag);
             FileLogger.log("VERBOSE", TAG, "Mapping Done");
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -130,7 +130,6 @@ public class OTPScreen extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         submitButton.setOnClickListener(v -> {
-            progressDialog.show();
             String otp = otpInput.getText().toString().trim();
             if (otp.isEmpty()) {
                 otpInput.setError("Please enter the OTP");
@@ -162,6 +161,24 @@ public class OTPScreen extends AppCompatActivity {
                 }
             }).start();
         });
+        radioYes.setOnClickListener(v -> {
+            this.whiteListingFlag = "Y";
+            try {
+                creqJson.put("whitelistingDataEntry", whiteListingFlag);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        radioNo.setOnClickListener(v -> {
+            this.whiteListingFlag = "N";
+            try {
+                creqJson.put("whitelistingDataEntry", whiteListingFlag);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
     }
 
     public void sendCreqRequest() {
@@ -176,7 +193,6 @@ public class OTPScreen extends AppCompatActivity {
                 String acsTransID = cres.has("acsTransID") ? String.valueOf(cres.get("acsTransID")) : "";
                 String counter = cres.has("acsCounterAtoS") ? cres.optString("acsCounterAtoS") : "001";
                 FileLogger.log("VERBOSE", TAG, "Transaction Status: " + transResult + " ,Counter Value: " + counter);
-                progressDialog.hide();
                 if (transResult.equalsIgnoreCase("Y") && cres.has("transStatus")) {
                     FileLogger.log("INFO", TAG, "Transaction Successful, Redirecting to Transaction Result Screen with status: " + response.toString());
                     SDKCall.triggerEvent(this, threeDSServerTransID, acsTransID, SdkTransId, transResult);
@@ -277,4 +293,5 @@ public class OTPScreen extends AppCompatActivity {
             return url;
         }
     }
+
 }

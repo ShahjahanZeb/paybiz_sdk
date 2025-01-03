@@ -8,10 +8,10 @@ import android.database.Cursor;
 
 import com.example.paybizsdk.Logger.FileLogger;
 import com.example.paybizsdk.screens.HTMLRender;
+import com.example.paybizsdk.screens.NpaOTPScreen;
 import com.example.paybizsdk.screens.OOBConfirmationScreen;
 import com.example.paybizsdk.screens.OTPScreen;
 import com.example.paybizsdk.screens.SingleSelectScreen;
-import com.example.paybizsdk.screens.TransactionResult;
 import com.example.paybizsdk.constants.SDKConstants;
 import com.example.paybizsdk.entity.AuthenticationRequestParameters;
 import com.example.paybizsdk.entity.ChallengeParameters;
@@ -20,7 +20,9 @@ import com.example.paybizsdk.entity.ProgressDialog;
 import com.example.paybizsdk.exceptions.InvalidInputException;
 import com.example.paybizsdk.interfaces.ThreeDS2Service;
 import com.example.paybizsdk.interfaces.Transaction;
+import com.example.paybizsdk.screens.WhiteListingOTP;
 import com.example.paybizsdk.utility.PostRequestTask;
+import com.example.paybizsdk.utility.SDKCall;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -116,7 +118,7 @@ public class TransactionService implements Transaction {
             String response = futureTask.get();
             if (response != null) {
                 FileLogger.log("INFO", TAG, "CRes Received" + response);
-                if(!response.contains("503")) {
+                if (!response.contains("503")) {
                     cresObject = new JSONObject(response);
                 }
             }
@@ -124,6 +126,10 @@ public class TransactionService implements Transaction {
             e.printStackTrace();
         }
         if (cresObject != null) {
+            String transResult = cresObject.has("transStatus") ? String.valueOf(cresObject.get("transStatus")) : "";
+            String SdkTransId = cresObject.has("sdkTransID") ? String.valueOf(cresObject.get("sdkTransID")) : "";
+            String threeDSServerTransID = cresObject.has("threeDSServerTransID") ? String.valueOf(cresObject.get("threeDSServerTransID")) : "";
+            String acsTransID = cresObject.has("acsTransID") ? String.valueOf(cresObject.get("acsTransID")) : "";
             String acsUiType = cresObject.optString("acsUiType", "");
             String acsHTML = cresObject.optString("acsHTML", null);
             if (acsUiType.equalsIgnoreCase("01") || acsUiType.equalsIgnoreCase("02")
@@ -155,7 +161,13 @@ public class TransactionService implements Transaction {
                 } else {
                     Intent intent = null;
                     if (isOtpCase) {
-                        intent = new Intent(currentActivity, OTPScreen.class);
+                        if (!cresObject.has("issuerImage") && !cresObject.has("psImage")) {
+                            intent = new Intent(currentActivity, NpaOTPScreen.class);
+                        } else if(cresObject.has("whitelistingInfoText")){
+                            intent = new Intent(currentActivity, WhiteListingOTP.class);
+                        }else {
+                            intent = new Intent(currentActivity, OTPScreen.class);
+                        }
                     } else if (isOobCase) {
                         intent = new Intent(currentActivity, OOBConfirmationScreen.class);
                     } else if (isSingleSelectCase) {
@@ -190,9 +202,6 @@ public class TransactionService implements Transaction {
                         }
 
                     }
-                    // Handle issuer and psImage for both cases
-//                    String defaultIssuerImage = "https://i.ibb.co/3k6GPqc/logibiz-logo-300x-1.png";
-//                    String defaultPsImage = "https://i.ibb.co/Fw9Gtrd/Picture1.png";
                     JSONObject issuerImageObject = cresObject.optJSONObject("issuerImage");
                     JSONObject psImageObject = cresObject.optJSONObject("psImage");
 
@@ -207,17 +216,12 @@ public class TransactionService implements Transaction {
                 }
             } else {
                 FileLogger.log("ERROR", TAG, "Error Case, Redirecting to Transaction Result Screen with Error");
-                Intent intent = new Intent(currentActivity, TransactionResult.class);
-                intent.putExtra("transStatus", cresObject.optString("transStatus", ""));
-                intent.putExtra("sdkTransID", cresObject.optString("sdkTransID", ""));
-                currentActivity.startActivity(intent);
+                SDKCall.triggerEvent(this.context, threeDSServerTransID, acsTransID, SdkTransId, transResult);
             }
         } else {
             FileLogger.log("ERROR", TAG, "Error Case, Redirecting to Transaction Result Screen with Error");
-            Intent intent = new Intent(currentActivity, TransactionResult.class);
-            intent.putExtra("transStatus", "Error while connecting ACS");
-            intent.putExtra("sdkTransID", "");
-            currentActivity.startActivity(intent);
+            SDKCall.triggerEvent(this.context, "", "", "", "Error while connecting ACS");
+//            currentActivity.startActivity(intent);
         }
     }
 
@@ -293,31 +297,23 @@ public class TransactionService implements Transaction {
         this.getProgressView(currentActivity).hide();
         try {
             if (cresObject != null) {
-                String transResult = cresObject.has("transStatus") ? String.valueOf(cresObject.get("transStatus")) : "Not Present";
-                String sdkTransId = cresObject.has("sdkTransID") ? String.valueOf(cresObject.get("sdkTransID")) : "Not Present";
+                String transResult = cresObject.has("transStatus") ? String.valueOf(cresObject.get("transStatus")) : "";
+                String sdkTransId = cresObject.has("sdkTransID") ? String.valueOf(cresObject.get("sdkTransID")) : "";
+                String threeDSServerTransID = cresObject.has("threeDSServerTransID") ? String.valueOf(cresObject.get("threeDSServerTransID")) : "";
+                String acsTransID = cresObject.has("acsTransID") ? String.valueOf(cresObject.get("acsTransID")) : "";
                 if (transResult.equalsIgnoreCase("Y")) {
                     FileLogger.log("INFO", TAG, "Transaction Successful, Redirecting to Transaction Result Screen with status: " + cresObject.toString());
-                    String transactionResult = "Success";
-                    Intent intent = new Intent(currentActivity, TransactionResult.class);
-                    intent.putExtra("transStatus", transactionResult);
-                    intent.putExtra("sdkTransID", sdkTransId);
-                    currentActivity.startActivity(intent);
+                    SDKCall.triggerEvent(this.context, threeDSServerTransID, acsTransID, sdkTransId, transResult);
                     currentActivity.finish();
                 } else {
                     FileLogger.log("INFO", TAG, "Transaction Unsuccessful, Redirecting to Transaction Result Screen with status: " + cresObject.toString());
-                    String transactionResult = "Payment Unsuccessful";
-                    Intent intent = new Intent(currentActivity, TransactionResult.class);
-                    intent.putExtra("transStatus", transactionResult);
-                    intent.putExtra("sdkTransID", sdkTransId);
-                    currentActivity.startActivity(intent);
+                    SDKCall.triggerEvent(this.context, threeDSServerTransID, acsTransID, sdkTransId, transResult);
                     currentActivity.finish();
                 }
             } else {
                 FileLogger.log("ERROR", TAG, "Error Case, Redirecting to Transaction Result Screen with Error");
-                Intent intent = new Intent(currentActivity, TransactionResult.class);
-                intent.putExtra("transStatus", "Error while connecting ACS");
-                intent.putExtra("sdkTransID", "");
-                currentActivity.startActivity(intent);
+                SDKCall.triggerEvent(this.context, "", "", "", "Error while Connection ACS");
+//                currentActivity.startActivity(intent);
             }
         } catch (JSONException e) {
             throw new RuntimeException(e);

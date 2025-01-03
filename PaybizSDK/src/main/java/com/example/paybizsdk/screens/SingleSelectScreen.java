@@ -2,7 +2,7 @@ package com.example.paybizsdk.screens;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-
+import com.example.paybizsdk.utility.SDKCall;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -231,16 +231,17 @@ public class SingleSelectScreen extends AppCompatActivity {
         try {
             creqJson.put("challengeDataEntry", challengeDataEntry);
             String response = this.callAcsForCreq();
+            JSONObject cres = new JSONObject(response.toString());
             if (response != null || response != "") {
-                JSONObject cres = new JSONObject(response.toString());
                 FileLogger.log("VERBOSE", TAG, "CRes Mapped to JSON Object: " + response);
                 renderOTPScreen(cres);
             } else {
                 FileLogger.log("ERROR", TAG, "No Response from ACS");
-                String transactionResult = "Error Connecting to ACS";
-                Intent intent = new Intent(this, TransactionResult.class);
-                intent.putExtra("transStatus", transactionResult);
-                startActivity(intent);
+                String transResult = cres.has("transStatus") ? String.valueOf(cres.get("transStatus")) : "Not Present";
+                String SdkTransId = cres.has("sdkTransID") ? String.valueOf(cres.get("sdkTransID")) : "Not Present";
+                String threeDSServerTransID = cres.has("threeDSServerTransID") ? String.valueOf(cres.get("threeDSServerTransID")) : "";
+                String acsTransID = cres.has("acsTransID") ? String.valueOf(cres.get("acsTransID")) : "";
+                SDKCall.triggerEvent(this, threeDSServerTransID, acsTransID, SdkTransId, transResult);
                 finish();
             }
         } catch (JSONException e) {

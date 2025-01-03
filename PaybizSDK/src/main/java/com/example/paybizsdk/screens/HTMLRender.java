@@ -26,6 +26,7 @@ public class HTMLRender extends AppCompatActivity {
     String acsURL, oobAppURL;
 
     Button backButton;
+
     private final String TAG = "HTML_RENDER";
 
     @Override
